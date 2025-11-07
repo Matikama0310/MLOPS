@@ -1,0 +1,24 @@
+# Python virtual environment
+.venv/
+venv/
+*.dll
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local MLflow database (should not be in version control)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# IDE / OS specific
+.vscode/
+.idea/
+*.DS_Store
+
+# files 
+data/
+*.csv
+*.zip
+*.parquet
