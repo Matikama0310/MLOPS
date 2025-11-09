@@ -193,6 +193,15 @@ def main(args):
         mlflow.log_metrics(metrics)
         mlflow.sklearn.log_model(pipeline, "final_model")
 
+        # Save run id to artifacts for replication by external apps
+        run_id = run.info.run_id
+        run_id_path = os.path.join(ARTIFACTS_DIR, "run_id.txt")
+        try:
+            with open(run_id_path, "w", encoding="utf-8") as fh:
+                fh.write(run_id)
+        except Exception as e:
+            print(f"Warning: could not write run_id to {run_id_path}: {e}")
+
         # ROC curve
         fpr, tpr, _ = roc_curve(y_te, y_prob)
         plt.figure(figsize=(6, 6))
