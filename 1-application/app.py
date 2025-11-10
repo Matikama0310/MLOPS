@@ -15,8 +15,13 @@ BASE_DIR = Path(__file__).resolve().parent
 RUN_ID_PATH = BASE_DIR / "artifacts" / "run_id.txt"
 
 # Prefer MLFLOW_TRACKING_URI from env, otherwise same default used in train.py
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
-
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+if not MLFLOW_TRACKING_URI:
+    # Resolve ./mlruns relative to this file; adjust if your mlruns lives elsewhere
+    mlruns_path = (BASE_DIR / "mlruns").resolve()
+    # MLflow expects POSIX-style paths and a file:// URI
+    MLFLOW_TRACKING_URI = f"file:///{mlruns_path.as_posix()}"
+    
 # add logger
 logger = logging.getLogger("ml_api")
 if not logger.handlers:
