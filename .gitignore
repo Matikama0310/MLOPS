@@ -22,3 +22,5 @@ data/
 *.csv
 *.zip
 *.parquet
+
+*.png
