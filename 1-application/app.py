@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 FastAPI inference service for the Mental Health survey classifier.
@@ -225,4 +224,4 @@ def predict_batch(payload: List[Dict[str, Any]] = Body(..., example=[
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app_mental:app", host="0.0.0.0", port=9696, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=9696, reload=True)
