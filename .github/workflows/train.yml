@@ -1,0 +1,39 @@
+# .github/workflows/train.yml
+
+name: Train
+
+on:
+  workflow_call:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r 06-cicd/requirements.txt
+
+      - name: Train model
+        working-directory: 06-cicd
+        run: python train.py
+
+      - name: Verify artifact contents
+        run: |
+          ls -R 06-cicd/models
+          cat 06-cicd/run_id.txt
+
+      - name: Upload trained model
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: |
+            06-cicd/run_id.txt
+            06-cicd/models/
+          retention-days: 7
