@@ -2,11 +2,12 @@
 """
 FastAPI inference service for the Mental Health survey classifier.
 
-Fixes included:
-- Replace pandas NA with numpy.nan before inference.
-- Add missing expected columns with np.nan (not pd.NA).
-- Coerce numeric features to numeric dtype; convert nullable booleans to float.
-- Load numeric/categorical feature lists from training_schema.json.
+- Loads sklearn Pipeline from MLflow using run_id.txt (or RUN_ID env).
+- Downloads training_schema.json (artifact logged by the training script)
+  to know which columns to expect/keep (including "retained_features").
+- Applies the same Gender cleaning used in training.
+- Supports single and batch predictions.
+- Returns class prediction and probability for "treatment=Yes" (label 1).
 """
 
 import os
@@ -16,7 +17,6 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Union
 
 import pandas as pd
-import numpy as np
 from fastapi import FastAPI, Body, HTTPException
 from pydantic import BaseModel, Field
 
@@ -36,8 +36,6 @@ RUN_ID: str = ""
 model = None
 schema: Dict[str, Any] = {}  # training_schema.json contents
 expected_columns: List[str] = []  # columns the pipeline expects
-numeric_features_g: List[str] = []
-categorical_features_g: List[str] = []
 target_col: str = "treatment"
 
 
@@ -84,16 +82,6 @@ def _compute_expected_columns(schema_json: Dict[str, Any]) -> List[str]:
     return list(dict.fromkeys([*num, *cat]))
 
 
-def _extract_num_cat(schema_json: Dict[str, Any]) -> (List[str], List[str]):
-    if not schema_json:
-        return [], []
-    num = schema_json.get("numeric_features") or []
-    cat = schema_json.get("categorical_features") or []
-    num = list(num) if isinstance(num, (list, tuple)) else []
-    cat = list(cat) if isinstance(cat, (list, tuple)) else []
-    return num, cat
-
-
 def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) -> pd.DataFrame:
     """Convert incoming JSON to a DataFrame, clean Gender, select expected columns, and drop target if present."""
     if isinstance(payload, dict):
@@ -105,9 +93,6 @@ def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) ->
 
     df = pd.DataFrame(rows)
 
-    # Normalize missing values: replace pandas NA with numpy.nan
-    df = df.replace({pd.NA: np.nan})
-
     # Remove target if present
     if target_col in df.columns:
         df = df.drop(columns=[target_col])
@@ -116,25 +101,14 @@ def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) ->
     if "Gender" in df.columns:
         df["Gender"] = df["Gender"].apply(clean_gender)
 
-    # Add any missing expected columns as np.nan so imputers can handle them
+    # Keep only expected columns if we know them
     if expected_columns:
         missing = [c for c in expected_columns if c not in df.columns]
+        # Add missing expected columns as NaN so ColumnTransformer can impute
         for c in missing:
-            df[c] = np.nan
+            df[c] = pd.NA
         # Order columns for consistency
         df = df[expected_columns]
-
-    # Coerce numeric features to numeric dtype (avoid nullable boolean issues)
-    num_cols = set(numeric_features_g or [])
-    if num_cols:
-        for c in (set(df.columns) & num_cols):
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-            # Convert pandas nullable boolean to float
-            if str(df[c].dtype) == "boolean":
-                df[c] = df[c].astype("float")
-
-    # Ensure any remaining pd.NA are numpy.nan to avoid ambiguous truth values
-    df = df.replace({pd.NA: np.nan})
 
     return df
 
@@ -153,7 +127,7 @@ class PredictResponse(BaseModel):
 # -----------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global RUN_ID, model, schema, expected_columns, numeric_features_g, categorical_features_g
+    global RUN_ID, model, schema, expected_columns
 
     # 1) read run id & set mlflow
     RUN_ID = _load_run_id()
@@ -162,16 +136,13 @@ async def lifespan(app: FastAPI):
     # 2) load model once
     model = mlflow.pyfunc.load_model(f"runs:/{RUN_ID}/model")
 
-    # 3) load schema to know expected columns and feature types
+    # 3) load schema to know expected columns
     schema = _load_schema(RUN_ID)
     expected_columns = _compute_expected_columns(schema)
-    numeric_features_g, categorical_features_g = _extract_num_cat(schema)
     if expected_columns:
         print(f"[startup] Using {len(expected_columns)} expected columns from training_schema.json")
     else:
         print("[startup] No schema found; using columns provided by requests")
-    if numeric_features_g or categorical_features_g:
-        print(f"[startup] numeric_features: {len(numeric_features_g)} | categorical_features: {len(categorical_features_g)}")
 
     yield
 
@@ -179,7 +150,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Mental Health Treatment Predictor",
     description="Predicts treatment need (Yes/No) from the mental health survey using the trained sklearn Pipeline logged to MLflow.",
-    version="1.1.0",
+    version="1.0.0",
     lifespan=lifespan,
 )
 
@@ -222,6 +193,7 @@ def predict(payload: Dict[str, Any] = Body(..., example={
             preds = (pd.Series(proba) >= 0.5).astype(int).tolist()
         else:
             preds = model.predict(df).tolist()
+            # best-effort probability if available via decision_function/logits is omitted for simplicity
             proba = [float(p) for p in preds]
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Inference failed: {e}")
