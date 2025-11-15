@@ -1,0 +1,85 @@
+# .github/workflows/ci-cd.yml
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+jobs:
+  call-train:
+    name: "Train Model"
+    uses: ./.github/workflows/train.yml
+
+  build-test-deploy:
+    name: "Build, Test, and Deploy"
+    needs: call-train
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install testing tools
+        run: pip install flake8 pytest requests
+
+      - name: Download latest trained-model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trained-model
+          path: 06-cicd/
+
+      - name: Verify downloaded artifact
+        run: ls -R 06-cicd
+
+      - name: Lint
+        working-directory: 06-cicd
+        run: flake8 . --max-line-length=100 --ignore=E501
+
+      - name: Build & Test Docker image
+        working-directory: 06-cicd
+        run: |
+          docker build -t mental-health-app .
+          docker run -d -p 9696:9696 --name mental-app mental-health-app
+          sleep 20
+          curl -f http://localhost:9696/health || (docker logs mental-app && exit 1)
+          pytest -q test_api.py
+          docker stop metnal-app && docker rm mental-app
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and Push Docker image to GHCR with Versioning
+        run: |
+          IMAGE_ID="ghcr.io/${{ github.repository }}"
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
+          
+          # Use the first 7 characters of the commit SHA as the version tag.
+          VERSION=$(echo "${{ github.sha }}" | cut -c1-7)
+          
+          echo "Pushing image: $IMAGE_ID with tags: latest, $VERSION"
+
+          # Tag with the unique version
+          docker tag mental-health-app "$IMAGE_ID:$VERSION"
+          
+          # Tag with 'latest'
+          docker tag mental-health-app "$IMAGE_ID:latest"
+          
+          # Push both tags
+          docker push "$IMAGE_ID:$VERSION"
+          docker push "$IMAGE_ID:latest"
