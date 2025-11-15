@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-Mental Health Training Script — Kaggle-only (with explicit cleanup)
+Mental Health Training Script — Kaggle-only (robust CSV selection)
 
-- Downloads data ONLY from Kaggle (no local CSV fallback).
-- Default dataset slug: osmi/mental-health-in-tech-survey (override with --kaggle_slug if needed).
-- Uses a TemporaryDirectory for all Kaggle files and ensures cleanup.
+Highlights:
+- Downloads ONLY from Kaggle (no local CSV fallback).
+- Defaults to slug: osmi/mental-health-in-tech-survey (override with --kaggle_slug).
+- If multiple CSVs exist, it **prefers a file containing 'survey'**; otherwise picks the largest CSV.
+- If --kaggle_file is given, it tries exact match, then case-insensitive suffix match,
+  then case-insensitive substring match; otherwise it raises with a helpful list.
+- Uses TemporaryDirectory and **deletes** all downloaded files afterward.
 - Preprocessing: Gender cleaning + ColumnTransformer (impute+scale numeric, impute+one-hot categorical).
-- Optional retained features file; trains on FULL data (no validation).
-- Logs sklearn Pipeline to MLflow + writes training_schema.json and run_id.txt.
+- Trains on FULL data (no validation), logs sklearn Pipeline to MLflow, and writes:
+  - training_schema.json
+  - run_id.txt
 
-Usage (example):
+Usage example:
     pip install kaggle
     # Put kaggle.json in ~/.kaggle/ (macOS/Linux) or C:\\Users\\<you>\\.kaggle\\ (Windows)
     # or export KAGGLE_USERNAME / KAGGLE_KEY
@@ -137,7 +142,7 @@ def build_model(model_name: str, params: dict):
 
 
 # -----------------------------
-# Kaggle download utilities (ONLY path) with explicit cleanup
+# Kaggle download utilities (robust) with explicit cleanup
 # -----------------------------
 def _have_kaggle_cli() -> bool:
     from shutil import which
@@ -156,6 +161,56 @@ def _ensure_kaggle_credentials():
         )
 
 
+def _choose_csv(candidates: List[Path], preferred_file: Optional[str]) -> Tuple[Path, str]:
+    """
+    Choose a CSV from candidates using robust rules:
+    - If preferred_file is given:
+        1) exact name match,
+        2) case-insensitive suffix match,
+        3) case-insensitive substring match,
+       otherwise raise with list of available files.
+    - If no preferred_file:
+        1) any file whose name contains 'survey' (case-insensitive); if multiple, pick the largest,
+        2) else pick the largest CSV by size.
+    """
+    if not candidates:
+        raise FileNotFoundError("No CSV files found in the Kaggle dataset contents.")
+
+    if preferred_file:
+        pref = preferred_file.lower()
+        # exact
+        exact = [p for p in candidates if p.name == preferred_file]
+        if exact:
+            chosen = exact[0]
+            return chosen, chosen.name
+        # suffix (useful when files live in folders or have prefixes)
+        suffix = [p for p in candidates if p.name.lower().endswith(pref)]
+        if suffix:
+            # if multiple, largest wins
+            chosen = max(suffix, key=lambda p: p.stat().st_size)
+            return chosen, chosen.name
+        # substring
+        substr = [p for p in candidates if pref in p.name.lower()]
+        if substr:
+            chosen = max(substr, key=lambda p: p.stat().st_size)
+            return chosen, chosen.name
+
+        raise FileNotFoundError(
+            f"Requested file '{preferred_file}' not found. "
+            f"Available: {[p.name for p in candidates]}"
+        )
+
+    # No preferred file: prefer names with 'survey'
+    surveyish = [p for p in candidates if "survey" in p.name.lower()]
+    if surveyish:
+        chosen = max(surveyish, key=lambda p: p.stat().st_size)
+        return chosen, chosen.name
+
+    # Otherwise pick the largest CSV available
+    chosen = max(candidates, key=lambda p: p.stat().st_size)
+    return chosen, chosen.name
+
+
 def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[pd.DataFrame, str]:
     """
     Download the Kaggle dataset into a TemporaryDirectory and return (DataFrame, chosen_filename).
@@ -168,41 +223,26 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
     tmpdir_obj = tempfile.TemporaryDirectory()
     tmpdir = Path(tmpdir_obj.name)
     try:
+        # download
         cmd = ["kaggle", "datasets", "download", "-d", slug, "-p", str(tmpdir), "-q"]
         subprocess.check_call(cmd)
 
-        # Unzip any archives
+        # unzip everything
         for z in tmpdir.glob("*.zip"):
             with zipfile.ZipFile(z, "r") as zf:
                 zf.extractall(tmpdir)
             z.unlink()
 
-        # Decide which CSV to use
+        # collect CSVs (from root or subfolders)
         candidates = list(tmpdir.rglob("*.csv"))
         if not candidates:
             raise FileNotFoundError(f"No CSV files found after downloading Kaggle dataset: {slug}")
 
-        if preferred_file:
-            exact = tmpdir / preferred_file
-            if exact.exists():
-                chosen = exact
-            else:
-                matches = [p for p in candidates if p.name == preferred_file or p.name.endswith(preferred_file)]
-                if not matches:
-                    raise FileNotFoundError(
-                        f"Requested file '{preferred_file}' not found in dataset {slug}. "
-                        f"Available: {[p.name for p in candidates]}"
-                    )
-                chosen = matches[0]
-        else:
-            surveyish = [p for p in candidates if "survey" in p.name.lower()]
-            chosen = surveyish[0] if surveyish else candidates[0]
-
-        df = pd.read_csv(chosen)
-        chosen_name = chosen.name
+        chosen_path, chosen_name = _choose_csv(candidates, preferred_file)
+        df = pd.read_csv(chosen_path)
         return df, chosen_name
     finally:
-        # Explicit cleanup of the TemporaryDirectory (deletes all files)
+        # cleanup
         try:
             tmpdir_obj.cleanup()
         except Exception:
@@ -222,14 +262,14 @@ def main():
     parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
     parser.add_argument("--output_runid", default="run_id.txt", help="Where to write MLflow run_id")
 
-    # Default to your Kaggle dataset; you can override via CLI
+    # Default to your preferred dataset (you can override via CLI)
     parser.add_argument(
         "--kaggle_slug",
         default="osmi/mental-health-in-tech-survey",
         required=False,
         help="Kaggle dataset slug (default: osmi/mental-health-in-tech-survey)"
     )
-    parser.add_argument("--kaggle_file", default="", help="Optional CSV filename inside the Kaggle dataset")
+    parser.add_argument("--kaggle_file", default="", help="Optional CSV filename (robust matching enabled)")
     args = parser.parse_args()
 
     # -----------------------------
