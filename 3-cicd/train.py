@@ -1,33 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-Adapted training script from the Jupyter notebook:
-- Uses the notebook's cleaned features and preprocessing.
-- Applies the selected/retained features (if a file from the notebook exists).
-- Uses the notebook's "best model" (if recorded); otherwise defaults to XGBoost.
-- Trains on the FULL dataset (no validation split), as requested.
-- Logs to MLflow and saves the fitted pipeline.
+Mental Health Training Script — with Kaggle download support
 
-Assumptions:
-- Data CSV path: ../data/raw/survey.csv (same as the notebook).
-- Optional files produced by the notebook (if you ran it):
-    - feature_selection_results.txt  (contains "Retained features" list)
-    - best_model_name.txt            (contains a single line with model name, e.g., "XGBoost")
-    - best_params.json               (JSON object of tuned hyperparameters for that model)
+Features:
+- Load data from a local CSV (default ../data/raw/survey.csv) OR directly from Kaggle using --kaggle_slug.
+- Applies the same preprocessing used in your notebook/training (Gender cleaning + ColumnTransformer).
+- Uses selected/retained features if feature_selection_results.txt exists (optional).
+- Trains on FULL data (no validation) with your chosen/best model and logs to MLflow.
+- Saves training_schema.json and run_id.txt for serving.
 
-You can override via CLI flags:
-    python adapted_notebook_train.py --data ../data/raw/survey.csv --mlflow_uri http://localhost:5000 \\
-        --experiment mental-health-tech-prediction --model XGBoost
+Kaggle usage examples:
+    pip install kaggle
+    # set MLFLOW_TRACKING_URI as you prefer (server or file store)
+    python train.py --kaggle_slug osmi/mental-health-in-tech-2016 --kaggle_file survey.csv \
+        --experiment mental-health-tech-prediction
+
+Local file:
+    python train.py --data ../data/raw/survey.csv --experiment mental-health-tech-prediction
 """
 
-import argparse
-import json
 import os
 import re
 import sys
-import warnings
+import json
+import zipfile
+import tempfile
+import subprocess
+from pathlib import Path
+from typing import List, Dict, Any
 
-import numpy as np
 import pandas as pd
+import numpy as np
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -38,19 +41,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
+import argparse
 import mlflow
 import mlflow.sklearn
 
-warnings.filterwarnings("ignore", category=UserWarning)
 
 # -----------------------------
-# Helpers mirroring the notebook
+# Helpers (notebook parity)
 # -----------------------------
-
 def clean_gender(gen: object) -> str:
-    """Normalize gender categories exactly like the notebook."""
     s = str(gen).strip().lower()
-    s = re.sub(r"[\\W_]+", " ", s).strip()
+    s = re.sub(r"[\W_]+", " ", s).strip()
     if s in {"m", "male", "man", "make", "mal", "malr", "msle", "masc", "mail", "boy"}:
         return "Male"
     if s in {"f", "female", "woman", "femake", "femail", "femme", "girl"}:
@@ -59,20 +60,13 @@ def clean_gender(gen: object) -> str:
 
 
 def read_retained_features(path: str) -> list:
-    """
-    Parse feature_selection_results.txt (if present) to extract retained features.
-    Expected format sections:
-        Retained features:
-        - col_a
-        - col_b
-    """
     if not os.path.exists(path):
         return []
     retained = []
     in_section = False
     with open(path, "r", encoding="utf-8") as fh:
         for line in fh:
-            line = line.rstrip("\\n")
+            line = line.rstrip("\n")
             if line.strip().lower().startswith("retained features"):
                 in_section = True
                 continue
@@ -82,21 +76,17 @@ def read_retained_features(path: str) -> list:
                 if line.strip().startswith("- "):
                     retained.append(line.strip()[2:])
                 else:
-                    # stop if section changed
                     break
     return retained
 
 
 def maybe_read_best_model(path: str) -> str:
-    """Read best model name from a tiny text file if it exists; else return empty string."""
     if os.path.exists(path):
-        val = open(path, "r", encoding="utf-8").read().strip()
-        return val
+        return open(path, "r", encoding="utf-8").read().strip()
     return ""
 
 
 def maybe_read_best_params(path: str) -> dict:
-    """Read best hyperparameters JSON if it exists; else return {}."""
     if os.path.exists(path):
         try:
             return json.load(open(path, "r", encoding="utf-8"))
@@ -106,7 +96,6 @@ def maybe_read_best_params(path: str) -> dict:
 
 
 def build_preprocessor(numeric_features: list, categorical_features: list) -> ColumnTransformer:
-    """ColumnTransformer mirroring the notebook: median+scale for numeric, most_frequent+OHE for categorical."""
     numeric_pipeline = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
         ("scale", StandardScaler())
@@ -123,9 +112,8 @@ def build_preprocessor(numeric_features: list, categorical_features: list) -> Co
 
 
 def build_model(model_name: str, params: dict):
-    """Construct the classifier specified by model_name with params (if any)."""
-    name = model_name.lower()
-    if name in {"xgb", "xgboost"}:
+    name = (model_name or "").lower()
+    if name in {"xgb", "xgboost"} or not name:
         default = dict(
             random_state=42, n_estimators=300, max_depth=4,
             learning_rate=0.05, subsample=0.8, colsample_bytree=0.8,
@@ -142,87 +130,133 @@ def build_model(model_name: str, params: dict):
         default.update(params or {})
         return RandomForestClassifier(**default)
     if name in {"logreg", "logistic", "logisticregression"}:
-        default = dict(max_iter=2000, solver="lbfgs", random_state=42)
+        default = dict(max_iter=2000, solver="lbfgs")
         default.update(params or {})
         return LogisticRegression(**default)
     raise ValueError(f"Unknown model name: {model_name}")
 
 
+# -----------------------------
+# Kaggle download utilities
+# -----------------------------
+def _have_kaggle_cli() -> bool:
+    from shutil import which
+    return which("kaggle") is not None
+
+
+def _kaggle_download(slug: str, out_dir: Path) -> Path:
+    """
+    Download a Kaggle dataset to out_dir using the Kaggle CLI.
+    Returns the path to the first CSV found (preferring *survey*.csv).
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    cmd = ["kaggle", "datasets", "download", "-d", slug, "-p", str(out_dir), "-q"]
+    subprocess.check_call(cmd)
+
+    csvs = []
+    for z in out_dir.glob("*.zip"):
+        with zipfile.ZipFile(z, "r") as zf:
+            zf.extractall(out_dir)
+        z.unlink()
+    csvs.extend(out_dir.glob("*.csv"))
+    if not csvs:
+        raise FileNotFoundError(f"No CSV files found after downloading Kaggle dataset: {slug}")
+    for cand in csvs:
+        if "survey" in cand.name.lower():
+            return cand
+    return csvs[0]
+
+
+def load_from_kaggle(slug: str, preferred_file: str | None = None) -> pd.DataFrame:
+    if not _have_kaggle_cli():
+        raise RuntimeError("Kaggle CLI not found. Install with `pip install kaggle` and configure your API token.")
+    with tempfile.TemporaryDirectory() as tmp:
+        tmpdir = Path(tmp)
+        csv_path = _kaggle_download(slug, tmpdir)
+        if preferred_file:
+            cand = tmpdir / preferred_file
+            if not cand.exists():
+                matches = list(tmpdir.rglob(preferred_file))
+                if not matches:
+                    raise FileNotFoundError(
+                        f"Requested file '{preferred_file}' not found in dataset {slug}. "
+                        f"Available: {[p.name for p in tmpdir.rglob('*.csv')]}"
+                    )
+                csv_path = matches[0]
+            else:
+                csv_path = cand
+        print(f"[KAGGLE] Using file: {csv_path.name}")
+        return pd.read_csv(csv_path)
+
+
+# -----------------------------
+# Main
+# -----------------------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="../data/raw/survey.csv", help="Path to survey.csv (same as notebook)")
-    parser.add_argument("--mlflow_uri", default="http://localhost:5000", help="MLflow Tracking URI")
+    parser.add_argument("--data", default="../data/raw/survey.csv", help="Path to survey CSV (if not using Kaggle)")
+    parser.add_argument("--mlflow_uri", default="http://127.0.0.1:5000", help="MLflow Tracking URI")
     parser.add_argument("--experiment", default="mental-health-tech-prediction", help="MLflow experiment name")
-    parser.add_argument("--model", default="", help="Force model name (e.g., XGBoost, RandomForest, LogisticRegression)")
+    parser.add_argument("--model", default="", help="Force model (XGBoost/RandomForest/LogisticRegression)")
     parser.add_argument("--best_model_file", default="best_model_name.txt", help="Optional file with best model name")
-    parser.add_argument("--best_params_file", default="best_params.json", help="Optional JSON file with best hyperparams")
+    parser.add_argument("--best_params_file", default="best_params.json", help="Optional JSON with tuned hyperparams")
     parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
-    parser.add_argument("--output_runid", default="run_id.txt", help="Where to save MLflow run_id")
+    parser.add_argument("--output_runid", default="run_id.txt", help="Where to write MLflow run_id")
+    # Kaggle flags
+    parser.add_argument("--kaggle_slug", default="", help="Kaggle dataset slug like 'osmi/mental-health-in-tech-2016'")
+    parser.add_argument("--kaggle_file", default="", help="Optional CSV filename inside the Kaggle dataset")
     args = parser.parse_args()
 
     # -----------------------------
-    # Load data
+    # Load data (Kaggle or local)
     # -----------------------------
-    if not os.path.exists(args.data):
-        print(f"[ERROR] Data file not found: {args.data}", file=sys.stderr)
-        sys.exit(2)
-
-    df = pd.read_csv(args.data)
-    print(f"Loaded data: {df.shape} from {args.data}")
+    if args.kaggle_slug:
+        df = load_from_kaggle(args.kaggle_slug, args.kaggle_file or None)
+        print(f"Loaded data from Kaggle: {df.shape}")
+    else:
+        if not os.path.exists(args.data):
+            print(f"[ERROR] Data not found: {args.data}", file=sys.stderr)
+            sys.exit(2)
+        df = pd.read_csv(args.data)
+        print(f"Loaded data: {df.shape} from {args.data}")
 
     # -----------------------------
-    # Target & feature prep (as in notebook)
+    # Target & feature prep
     # -----------------------------
     target_col = "treatment"
     if target_col not in df.columns:
         print(f"[ERROR] Expected target column '{target_col}' not found in data.", file=sys.stderr)
         sys.exit(3)
 
-    # Binary mapping Yes/No -> 1/0
     y = df[target_col].map({"Yes": 1, "No": 0}).astype(int)
     features_to_drop = ["Timestamp", "Country", "state", "comments", target_col]
     existing_to_drop = [c for c in features_to_drop if c in df.columns]
     X = df.drop(columns=existing_to_drop)
 
-    # Gender cleaning
     if "Gender" in X.columns:
         X["Gender"] = X["Gender"].apply(clean_gender)
 
-    # Use retained features if provided
     retained = read_retained_features(args.features_file)
     if retained:
-        # Keep intersection to avoid KeyError
         retained = [c for c in retained if c in X.columns]
-        if not retained:
-            print("[WARN] Retained-features list was empty after intersecting with columns; falling back to all features.")
-        else:
+        if retained:
             X = X[retained]
             print(f"Using {len(retained)} retained features from {args.features_file}")
 
-    # Separate features by dtype (same approach as the notebook)
     numeric_features = X.select_dtypes(include=["number", "bool"]).columns.tolist()
     categorical_features = X.select_dtypes(include=["object", "category"]).columns.tolist()
+    print(f"Numeric: {len(numeric_features)} | Categorical: {len(categorical_features)}")
 
-    print(f"Numeric features: {len(numeric_features)} | Categorical features: {len(categorical_features)}")
-
-    # -----------------------------
-    # Preprocessor & model
-    # -----------------------------
     preprocessor = build_preprocessor(numeric_features, categorical_features)
 
-    # Resolve best model
     chosen_model_name = args.model or maybe_read_best_model(args.best_model_file) or "XGBoost"
     best_params = maybe_read_best_params(args.best_params_file)
     model = build_model(chosen_model_name, best_params)
 
-    # Full pipeline
-    pipeline = Pipeline([
-        ("preprocess", preprocessor),
-        ("model", model)
-    ])
+    pipeline = Pipeline([("preprocess", preprocessor), ("model", model)])
 
     # -----------------------------
-    # MLflow logging & training (NO validation split; fit on all data)
+    # MLflow logging (NO validation; fit on full data)
     # -----------------------------
     mlflow.set_tracking_uri(args.mlflow_uri)
     mlflow.set_experiment(args.experiment)
@@ -231,7 +265,6 @@ def main():
         run_id = run.info.run_id
         print(f"MLflow run_id: {run_id}")
 
-        # Log basic params
         mlflow.log_params({
             "model_name": chosen_model_name,
             "n_numeric_features": len(numeric_features),
@@ -242,10 +275,8 @@ def main():
         if best_params:
             mlflow.log_params({f"best__{k}": v for k, v in best_params.items()})
 
-        # Fit on FULL data
         pipeline.fit(X, y)
 
-        # Log artifact: retained features (if any) and schema
         schema = {
             "numeric_features": numeric_features,
             "categorical_features": categorical_features,
@@ -256,10 +287,8 @@ def main():
             json.dump(schema, fh, indent=2)
         mlflow.log_artifact("training_schema.json")
 
-        # Log the full sklearn pipeline
         mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
-        # Persist run_id for downstream use
         with open(args.output_runid, "w", encoding="utf-8") as fh:
             fh.write(run_id)
 

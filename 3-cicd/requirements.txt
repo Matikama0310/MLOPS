@@ -17,3 +17,4 @@ boto3>=1.40
 pytest>=7.0
 requests>=2.31
 flake8>=7.0
+kaggle>=1.7.4.5
