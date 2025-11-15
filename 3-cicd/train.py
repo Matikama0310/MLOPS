@@ -15,7 +15,7 @@ Usage:
 
     python train_kaggle_only_clean.py \
         --kaggle_slug osmi/mental-health-in-tech-2016 \
-        --kaggle_file survey.csv \
+        --kaggle_file mental-heath-in-tech-2016_20161114.csv \
         --experiment mental-health-tech-prediction \
         --mlflow_uri http://127.0.0.1:5000
 """
@@ -184,7 +184,7 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
                     )
                 chosen = matches[0]
         else:
-            surveyish = [p for p in candidates if "survey" in p.name.lower()]
+            surveyish = [p for p in candidates if "mental-heath-in-tech-2016_20161114" in p.name.lower()]
             chosen = surveyish[0] if surveyish else candidates[0]
 
         df = pd.read_csv(chosen)
