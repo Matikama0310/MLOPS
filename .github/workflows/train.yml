@@ -48,13 +48,13 @@ jobs:
 
       # OPTIONAL sanity check (uncomment if you want to fail fast when creds are wrong)
       # - name: Verify Kaggle connectivity
-      #   run: kaggle datasets metadata osmi/mental-health-in-tech-2016
+      #   run: kaggle datasets metadata osmi/mental-health-in-tech-survey
 
       - name: Train model (Kaggle-only)
         working-directory: 3-cicd
         run: |
           python train.py \
-            --kaggle_slug osmi/mental-health-in-tech-2016 \
+            --kaggle_slug osmi/mental-health-in-tech-survey \
             --kaggle_file survey.csv \
             --experiment mental-health-tech-prediction
 
