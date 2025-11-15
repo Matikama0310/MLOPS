@@ -1,5 +1,4 @@
 # .github/workflows/train.yml
-
 name: Train
 
 on:
@@ -8,6 +7,13 @@ on:
 jobs:
   train:
     runs-on: ubuntu-latest
+
+    # Use a local MLflow file store; Kaggle creds from secrets
+    env:
+      MLFLOW_TRACKING_URI: file:./mlruns
+      KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,23 +23,57 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
-        run: pip install -r 3-cicd/requirements.txt
-
-      - name: Train model
-        working-directory: 3-cicd
-        run: python train.py
-
-      - name: Verify artifact contents
         run: |
-          ls -R 3-cicd/models
-          cat 3-cicd/run_id.txt
+          python -m pip install --upgrade pip
+          pip install -r 3-cicd/requirements.txt
+          # Ensure Kaggle CLI is present (add here if not in your requirements)
+          pip install kaggle
 
-      - name: Upload trained model
+      # Create ~/.kaggle/kaggle.json from secrets (most reliable for the kaggle CLI)
+      - name: Configure Kaggle credentials
+        shell: bash
+        run: |
+          mkdir -p ~/.kaggle
+          printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+
+      # OPTIONAL sanity check (uncomment if you want to fail fast when creds are wrong)
+      # - name: Verify Kaggle connectivity
+      #   run: kaggle datasets metadata osmi/mental-health-in-tech-2016
+
+      - name: Train model (Kaggle-only)
+        working-directory: 3-cicd
+        run: |
+          python train.py \
+            --kaggle_slug osmi/mental-health-in-tech-2016 \
+            --kaggle_file survey.csv \
+            --experiment mental-health-tech-prediction
+
+      - name: Verify artifacts
+        run: |
+          echo "----- run_id.txt -----"
+          cat 3-cicd/run_id.txt
+          echo "----- training_schema.json -----"
+          test -f 3-cicd/training_schema.json && head -n 50 3-cicd/training_schema.json || echo "missing training_schema.json"
+          echo "----- mlruns tree -----"
+          find mlruns -maxdepth 3 -type d -print | head -n 100
+
+      - name: Upload trained artifacts
         uses: actions/upload-artifact@v4
         with:
           name: trained-model
           path: |
             3-cicd/run_id.txt
-            3-cicd/models/
+            3-cicd/training_schema.json
+            mlruns/**/*
+          if-no-files-found: warn
           retention-days: 7

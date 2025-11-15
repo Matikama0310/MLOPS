@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-Mental Health Training Script — with Kaggle download support
+Mental Health Training Script — Kaggle-only (with explicit cleanup)
 
-Features:
-- Load data from a local CSV (default ../data/raw/survey.csv) OR directly from Kaggle using --kaggle_slug.
-- Applies the same preprocessing used in your notebook/training (Gender cleaning + ColumnTransformer).
-- Uses selected/retained features if feature_selection_results.txt exists (optional).
-- Trains on FULL data (no validation) with your chosen/best model and logs to MLflow.
-- Saves training_schema.json and run_id.txt for serving.
+- Downloads data ONLY from Kaggle (no local CSV fallback).
+- Uses a TemporaryDirectory for all Kaggle files and ensures cleanup.
+- Same preprocessing as before (Gender cleaning + ColumnTransformer).
+- Optional retained features file; trains on FULL data (no validation).
+- Logs sklearn Pipeline to MLflow + writes training_schema.json and run_id.txt.
 
-Kaggle usage examples:
+Usage:
     pip install kaggle
-    # set MLFLOW_TRACKING_URI as you prefer (server or file store)
-    python train.py --kaggle_slug osmi/mental-health-in-tech-2016 --kaggle_file survey.csv \
-        --experiment mental-health-tech-prediction
+    # Put kaggle.json in ~/.kaggle/ (macOS/Linux) or C:\\Users\\<you>\\.kaggle\\ (Windows)
+    # or set env vars KAGGLE_USERNAME / KAGGLE_KEY
 
-Local file:
-    python train.py --data ../data/raw/survey.csv --experiment mental-health-tech-prediction
+    python train_kaggle_only_clean.py \
+        --kaggle_slug osmi/mental-health-in-tech-2016 \
+        --kaggle_file survey.csv \
+        --experiment mental-health-tech-prediction \
+        --mlflow_uri http://127.0.0.1:5000
 """
 
 import os
@@ -24,10 +25,11 @@ import re
 import sys
 import json
 import zipfile
+import shutil
 import tempfile
 import subprocess
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Tuple
 
 import pandas as pd
 import numpy as np
@@ -137,64 +139,70 @@ def build_model(model_name: str, params: dict):
 
 
 # -----------------------------
-# Kaggle download utilities
+# Kaggle download utilities (ONLY path) with explicit cleanup
 # -----------------------------
 def _have_kaggle_cli() -> bool:
     from shutil import which
     return which("kaggle") is not None
 
 
-def _kaggle_download(slug: str, out_dir: Path) -> Path:
+def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[pd.DataFrame, str]:
     """
-    Download a Kaggle dataset to out_dir using the Kaggle CLI.
-    Returns the path to the first CSV found (preferring *survey*.csv).
+    Download the Kaggle dataset into a TemporaryDirectory and return (DataFrame, chosen_filename).
+    Ensures all temporary files are cleaned after reading.
     """
-    out_dir.mkdir(parents=True, exist_ok=True)
-    cmd = ["kaggle", "datasets", "download", "-d", slug, "-p", str(out_dir), "-q"]
-    subprocess.check_call(cmd)
-
-    csvs = []
-    for z in out_dir.glob("*.zip"):
-        with zipfile.ZipFile(z, "r") as zf:
-            zf.extractall(out_dir)
-        z.unlink()
-    csvs.extend(out_dir.glob("*.csv"))
-    if not csvs:
-        raise FileNotFoundError(f"No CSV files found after downloading Kaggle dataset: {slug}")
-    for cand in csvs:
-        if "survey" in cand.name.lower():
-            return cand
-    return csvs[0]
-
-
-def load_from_kaggle(slug: str, preferred_file: str | None = None) -> pd.DataFrame:
     if not _have_kaggle_cli():
         raise RuntimeError("Kaggle CLI not found. Install with `pip install kaggle` and configure your API token.")
-    with tempfile.TemporaryDirectory() as tmp:
-        tmpdir = Path(tmp)
-        csv_path = _kaggle_download(slug, tmpdir)
+
+    tmpdir_obj = tempfile.TemporaryDirectory()
+    tmpdir = Path(tmpdir_obj.name)
+    try:
+        cmd = ["kaggle", "datasets", "download", "-d", slug, "-p", str(tmpdir), "-q"]
+        subprocess.check_call(cmd)
+
+        # Unzip any archives
+        for z in tmpdir.glob("*.zip"):
+            with zipfile.ZipFile(z, "r") as zf:
+                zf.extractall(tmpdir)
+            z.unlink()
+
+        # Decide which CSV to use
+        candidates = list(tmpdir.rglob("*.csv"))
+        if not candidates:
+            raise FileNotFoundError(f"No CSV files found after downloading Kaggle dataset: {slug}")
+
         if preferred_file:
-            cand = tmpdir / preferred_file
-            if not cand.exists():
-                matches = list(tmpdir.rglob(preferred_file))
+            exact = tmpdir / preferred_file
+            if exact.exists():
+                chosen = exact
+            else:
+                matches = [p for p in candidates if p.name == preferred_file or p.name.endswith(preferred_file)]
                 if not matches:
                     raise FileNotFoundError(
                         f"Requested file '{preferred_file}' not found in dataset {slug}. "
-                        f"Available: {[p.name for p in tmpdir.rglob('*.csv')]}"
+                        f"Available: {[p.name for p in candidates]}"
                     )
-                csv_path = matches[0]
-            else:
-                csv_path = cand
-        print(f"[KAGGLE] Using file: {csv_path.name}")
-        return pd.read_csv(csv_path)
+                chosen = matches[0]
+        else:
+            surveyish = [p for p in candidates if "survey" in p.name.lower()]
+            chosen = surveyish[0] if surveyish else candidates[0]
+
+        df = pd.read_csv(chosen)
+        chosen_name = chosen.name
+        return df, chosen_name
+    finally:
+        # Explicit cleanup of the TemporaryDirectory (deletes all files)
+        try:
+            tmpdir_obj.cleanup()
+        except Exception:
+            shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 # -----------------------------
-# Main
+# Main (Kaggle-only)
 # -----------------------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="../data/raw/survey.csv", help="Path to survey CSV (if not using Kaggle)")
     parser.add_argument("--mlflow_uri", default="http://127.0.0.1:5000", help="MLflow Tracking URI")
     parser.add_argument("--experiment", default="mental-health-tech-prediction", help="MLflow experiment name")
     parser.add_argument("--model", default="", help="Force model (XGBoost/RandomForest/LogisticRegression)")
@@ -202,23 +210,15 @@ def main():
     parser.add_argument("--best_params_file", default="best_params.json", help="Optional JSON with tuned hyperparams")
     parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
     parser.add_argument("--output_runid", default="run_id.txt", help="Where to write MLflow run_id")
-    # Kaggle flags
-    parser.add_argument("--kaggle_slug", default="", help="Kaggle dataset slug like 'osmi/mental-health-in-tech-2016'")
+    parser.add_argument("--kaggle_slug", default="osmi/mental-health-in-tech-2016", required=False, help="Kaggle dataset slug like 'osmi/mental-health-in-tech-2016'")
     parser.add_argument("--kaggle_file", default="", help="Optional CSV filename inside the Kaggle dataset")
     args = parser.parse_args()
 
     # -----------------------------
-    # Load data (Kaggle or local)
+    # Load data FROM KAGGLE (only; auto-clean temporary files)
     # -----------------------------
-    if args.kaggle_slug:
-        df = load_from_kaggle(args.kaggle_slug, args.kaggle_file or None)
-        print(f"Loaded data from Kaggle: {df.shape}")
-    else:
-        if not os.path.exists(args.data):
-            print(f"[ERROR] Data not found: {args.data}", file=sys.stderr)
-            sys.exit(2)
-        df = pd.read_csv(args.data)
-        print(f"Loaded data: {df.shape} from {args.data}")
+    df, chosen_name = _kaggle_download_to_tmp(args.kaggle_slug, args.kaggle_file or None)
+    print(f"[KAGGLE] Using file: {chosen_name}  |  shape={df.shape}")
 
     # -----------------------------
     # Target & feature prep
