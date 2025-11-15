@@ -38,17 +38,17 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: trained-model
-          path: 06-cicd/
+          path: 3-cicd/
 
       - name: Verify downloaded artifact
-        run: ls -R 06-cicd
+        run: ls -R 3-cicd
 
       - name: Lint
-        working-directory: 06-cicd
+        working-directory: 3-cicd
         run: flake8 . --max-line-length=100 --ignore=E501
 
       - name: Build & Test Docker image
-        working-directory: 06-cicd
+        working-directory: 3-cicd
         run: |
           docker build -t mental-health-app .
           docker run -d -p 9696:9696 --name mental-app mental-health-app
