@@ -1,26 +1,28 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Mental Health Training Script — Kaggle-only (robust CSV selection)
+Mental Health Training Script — Kaggle-only (robust + MLflow-safe)
 
-Highlights:
 - Downloads ONLY from Kaggle (no local CSV fallback).
 - Defaults to slug: osmi/mental-health-in-tech-survey (override with --kaggle_slug).
-- If multiple CSVs exist, it **prefers a file containing 'survey'**; otherwise picks the largest CSV.
-- If --kaggle_file is given, it tries exact match, then case-insensitive suffix match,
-  then case-insensitive substring match; otherwise it raises with a helpful list.
-- Uses TemporaryDirectory and **deletes** all downloaded files afterward.
+- Robust CSV selection:
+    * If --kaggle_file is provided: exact → case-insensitive suffix → case-insensitive substring.
+    * If not provided: prefer a file containing 'survey' (case-insensitive), else pick largest CSV.
+- Cleans up temporary files after reading.
 - Preprocessing: Gender cleaning + ColumnTransformer (impute+scale numeric, impute+one-hot categorical).
-- Trains on FULL data (no validation), logs sklearn Pipeline to MLflow, and writes:
-  - training_schema.json
-  - run_id.txt
+- Trains on FULL data (no validation) and logs to MLflow.
+- MLflow URI resolver: env MLFLOW_TRACKING_URI → --mlflow_uri → fallback 'file:./mlruns'.
+  If a remote URI is unreachable, auto-fallback to 'file:./mlruns'.
+- Writes:
+    * training_schema.json
+    * run_id.txt
 
 Usage example:
     pip install kaggle
     # Put kaggle.json in ~/.kaggle/ (macOS/Linux) or C:\\Users\\<you>\\.kaggle\\ (Windows)
     # or export KAGGLE_USERNAME / KAGGLE_KEY
     python train.py --kaggle_file survey.csv \
-        --experiment mental-health-tech-prediction \
-        --mlflow_uri http://127.0.0.1:5000
+        --experiment mental-health-tech-prediction
 """
 
 import os
@@ -64,10 +66,10 @@ def clean_gender(gen: object) -> str:
     return "Other"
 
 
-def read_retained_features(path: str) -> list:
+def read_retained_features(path: str) -> List[str]:
     if not os.path.exists(path):
         return []
-    retained = []
+    retained: List[str] = []
     in_section = False
     with open(path, "r", encoding="utf-8") as fh:
         for line in fh:
@@ -91,7 +93,7 @@ def maybe_read_best_model(path: str) -> str:
     return ""
 
 
-def maybe_read_best_params(path: str) -> dict:
+def maybe_read_best_params(path: str) -> Dict[str, Any]:
     if os.path.exists(path):
         try:
             return json.load(open(path, "r", encoding="utf-8"))
@@ -100,11 +102,12 @@ def maybe_read_best_params(path: str) -> dict:
     return {}
 
 
-def build_preprocessor(numeric_features: list, categorical_features: list) -> ColumnTransformer:
+def build_preprocessor(numeric_features: List[str], categorical_features: List[str]) -> ColumnTransformer:
     numeric_pipeline = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler())
+        ("scale", StandardScaler()),
     ])
+    # Note: sparse_output requires sklearn >=1.2; if you use older, change to sparse=False.
     categorical_pipeline = Pipeline([
         ("impute", SimpleImputer(strategy="most_frequent")),
         ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
@@ -116,21 +119,21 @@ def build_preprocessor(numeric_features: list, categorical_features: list) -> Co
     return preprocessor
 
 
-def build_model(model_name: str, params: dict):
+def build_model(model_name: str, params: Dict[str, Any]):
     name = (model_name or "").lower()
     if name in {"xgb", "xgboost"} or not name:
         default = dict(
             random_state=42, n_estimators=300, max_depth=4,
             learning_rate=0.05, subsample=0.8, colsample_bytree=0.8,
             n_jobs=-1, reg_lambda=1.0, objective="binary:logistic",
-            eval_metric="logloss"
+            eval_metric="logloss",
         )
         default.update(params or {})
         return XGBClassifier(**default)
     if name in {"rf", "randomforest", "random_forest"}:
         default = dict(
             n_estimators=400, max_depth=None, min_samples_split=2,
-            class_weight=None, random_state=42, n_jobs=-1
+            class_weight=None, random_state=42, n_jobs=-1,
         )
         default.update(params or {})
         return RandomForestClassifier(**default)
@@ -168,7 +171,7 @@ def _choose_csv(candidates: List[Path], preferred_file: Optional[str]) -> Tuple[
         1) exact name match,
         2) case-insensitive suffix match,
         3) case-insensitive substring match,
-       otherwise raise with list of available files.
+       otherwise raise with the list of available files.
     - If no preferred_file:
         1) any file whose name contains 'survey' (case-insensitive); if multiple, pick the largest,
         2) else pick the largest CSV by size.
@@ -183,10 +186,9 @@ def _choose_csv(candidates: List[Path], preferred_file: Optional[str]) -> Tuple[
         if exact:
             chosen = exact[0]
             return chosen, chosen.name
-        # suffix (useful when files live in folders or have prefixes)
+        # suffix
         suffix = [p for p in candidates if p.name.lower().endswith(pref)]
         if suffix:
-            # if multiple, largest wins
             chosen = max(suffix, key=lambda p: p.stat().st_size)
             return chosen, chosen.name
         # substring
@@ -194,10 +196,8 @@ def _choose_csv(candidates: List[Path], preferred_file: Optional[str]) -> Tuple[
         if substr:
             chosen = max(substr, key=lambda p: p.stat().st_size)
             return chosen, chosen.name
-
         raise FileNotFoundError(
-            f"Requested file '{preferred_file}' not found. "
-            f"Available: {[p.name for p in candidates]}"
+            f"Requested file '{preferred_file}' not found. Available: {[p.name for p in candidates]}"
         )
 
     # No preferred file: prefer names with 'survey'
@@ -206,7 +206,7 @@ def _choose_csv(candidates: List[Path], preferred_file: Optional[str]) -> Tuple[
         chosen = max(surveyish, key=lambda p: p.stat().st_size)
         return chosen, chosen.name
 
-    # Otherwise pick the largest CSV available
+    # Otherwise pick the largest CSV
     chosen = max(candidates, key=lambda p: p.stat().st_size)
     return chosen, chosen.name
 
@@ -223,17 +223,17 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
     tmpdir_obj = tempfile.TemporaryDirectory()
     tmpdir = Path(tmpdir_obj.name)
     try:
-        # download
+        # Download
         cmd = ["kaggle", "datasets", "download", "-d", slug, "-p", str(tmpdir), "-q"]
         subprocess.check_call(cmd)
 
-        # unzip everything
+        # Unzip everything
         for z in tmpdir.glob("*.zip"):
             with zipfile.ZipFile(z, "r") as zf:
                 zf.extractall(tmpdir)
             z.unlink()
 
-        # collect CSVs (from root or subfolders)
+        # Collect CSVs (from root or subfolders)
         candidates = list(tmpdir.rglob("*.csv"))
         if not candidates:
             raise FileNotFoundError(f"No CSV files found after downloading Kaggle dataset: {slug}")
@@ -242,7 +242,7 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
         df = pd.read_csv(chosen_path)
         return df, chosen_name
     finally:
-        # cleanup
+        # Explicit cleanup of the TemporaryDirectory (deletes all files)
         try:
             tmpdir_obj.cleanup()
         except Exception:
@@ -250,11 +250,29 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
 
 
 # -----------------------------
+# MLflow: safe URI resolver + fallback
+# -----------------------------
+def _resolve_mlflow_uri(user_uri: Optional[str]) -> str:
+    """
+    Priority:
+      1) env MLFLOW_TRACKING_URI if set
+      2) user --mlflow_uri if provided
+      3) fallback to 'file:./mlruns'
+    """
+    env_uri = os.getenv("MLFLOW_TRACKING_URI")
+    if env_uri:
+        return env_uri
+    if user_uri:
+        return user_uri
+    return "file:./mlruns"
+
+
+# -----------------------------
 # Main (Kaggle-only)
 # -----------------------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mlflow_uri", default="http://127.0.0.1:5000", help="MLflow Tracking URI")
+    parser.add_argument("--mlflow_uri", default="", help="MLflow Tracking URI (env MLFLOW_TRACKING_URI takes precedence)")
     parser.add_argument("--experiment", default="mental-health-tech-prediction", help="MLflow experiment name")
     parser.add_argument("--model", default="", help="Force model (XGBoost/RandomForest/LogisticRegression)")
     parser.add_argument("--best_model_file", default="best_model_name.txt", help="Optional file with best model name")
@@ -262,7 +280,7 @@ def main():
     parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
     parser.add_argument("--output_runid", default="run_id.txt", help="Where to write MLflow run_id")
 
-    # Default to your preferred dataset (you can override via CLI)
+    # Default to your preferred dataset; you can override via CLI
     parser.add_argument(
         "--kaggle_slug",
         default="osmi/mental-health-in-tech-survey",
@@ -316,7 +334,18 @@ def main():
     # -----------------------------
     # MLflow logging (NO validation; fit on full data)
     # -----------------------------
-    mlflow.set_tracking_uri(args.mlflow_uri)
+    mlflow_uri = _resolve_mlflow_uri(args.mlflow_uri)
+    mlflow.set_tracking_uri(mlflow_uri)
+
+    # If someone passed an HTTP URI that isn't reachable, fall back automatically.
+    try:
+        mlflow.get_experiment_by_name(args.experiment)
+    except Exception:
+        if isinstance(mlflow_uri, str) and mlflow_uri.startswith(("http://", "https://")):
+            print(f"[WARN] Cannot reach MLflow at {mlflow_uri}. Falling back to 'file:./mlruns'.")
+            mlflow_uri = "file:./mlruns"
+            mlflow.set_tracking_uri(mlflow_uri)
+
     mlflow.set_experiment(args.experiment)
 
     with mlflow.start_run() as run:
@@ -339,7 +368,11 @@ def main():
             "numeric_features": numeric_features,
             "categorical_features": categorical_features,
             "retained_features": retained or "ALL_COLUMNS",
-            "target": target_col
+            "target": target_col,
+            "kaggle": {
+                "slug": args.kaggle_slug,
+                "chosen_file": chosen_name
+            }
         }
         with open("training_schema.json", "w", encoding="utf-8") as fh:
             json.dump(schema, fh, indent=2)
