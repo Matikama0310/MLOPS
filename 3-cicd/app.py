@@ -19,24 +19,26 @@ import pandas as pd
 import numpy as np
 from fastapi import FastAPI, Body, HTTPException
 from pydantic import BaseModel, Field
-
 import mlflow
 import mlflow.pyfunc
 from mlflow.artifacts import download_artifacts
+
 
 # -----------------------------
 # Tiny dummy model (for tests / no-artifacts mode)
 # -----------------------------
 class _DummyModel:
-    """Minimal model that always predicts 0 with prob 0.0.
-    Used only when no real model is available, so tests can exercise endpoints."""
+    """Minimal model that always predicts 0 with prob 0.0."""
+
     def predict_proba(self, X):
         import numpy as _np
         n = len(X)
         return _np.c_[_np.ones(n, dtype=float), _np.zeros(n, dtype=float)]
+
     def predict(self, X):
         import numpy as _np
         return _np.zeros(len(X), dtype=int)
+
 
 # -----------------------------
 # Config (env overridable)
@@ -45,11 +47,9 @@ PORT = int(os.getenv("PORT", "8000"))
 
 MODEL_URI = os.getenv("MODEL_URI", "./model")
 SCHEMA_PATH = os.getenv("SCHEMA_PATH", "./training_schema.json")
-
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "").strip()
 RUN_ID_FILE = os.getenv("RUN_ID_FILE", "run_id.txt")
 RUN_ID_ENV = os.getenv("RUN_ID", "").strip()
-
 ALLOW_DUMMY = os.getenv("ALLOW_DUMMY", "1")  # set to "0" to disable dummy fallback
 
 # Globals
@@ -60,6 +60,7 @@ expected_columns: List[str] = []
 numeric_features_g: List[str] = []
 categorical_features_g: List[str] = []
 target_col: str = "treatment"
+
 
 # -----------------------------
 # Helpers (mirror training)
@@ -73,6 +74,7 @@ def clean_gender(gen: object) -> str:
         return "Female"
     return "Other"
 
+
 def _load_run_id() -> str:
     if RUN_ID_ENV:
         return RUN_ID_ENV
@@ -81,12 +83,14 @@ def _load_run_id() -> str:
         return p.read_text(encoding="utf-8").strip()
     return ""
 
+
 def _load_schema_from_file(path: str) -> Dict[str, Any]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             return json.load(fh)
     except Exception:
         return {}
+
 
 def _load_schema_from_mlflow(run_id: str) -> Dict[str, Any]:
     try:
@@ -95,6 +99,7 @@ def _load_schema_from_mlflow(run_id: str) -> Dict[str, Any]:
             return json.load(fh)
     except Exception:
         return {}
+
 
 def _compute_expected_columns(schema_json: Dict[str, Any]) -> List[str]:
     if not schema_json:
@@ -106,6 +111,7 @@ def _compute_expected_columns(schema_json: Dict[str, Any]) -> List[str]:
     cat = schema_json.get("categorical_features", []) or []
     return list(dict.fromkeys([*num, *cat]))
 
+
 def _extract_num_cat(schema_json: Dict[str, Any]) -> Tuple[List[str], List[str]]:
     if not schema_json:
         return [], []
@@ -114,6 +120,7 @@ def _extract_num_cat(schema_json: Dict[str, Any]) -> Tuple[List[str], List[str]]
     num = list(num) if isinstance(num, (list, tuple)) else []
     cat = list(cat) if isinstance(cat, (list, tuple)) else []
     return num, cat
+
 
 def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) -> pd.DataFrame:
     if isinstance(payload, dict):
@@ -124,11 +131,11 @@ def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) ->
         raise HTTPException(status_code=400, detail="Payload must be an object or a list of objects.")
 
     df = pd.DataFrame(rows)
-
-    # Normalize missing values / booleans
     df = df.replace({pd.NA: np.nan})
+
     if target_col in df.columns:
         df = df.drop(columns=[target_col])
+
     if "Gender" in df.columns:
         df["Gender"] = df["Gender"].apply(clean_gender)
 
@@ -148,6 +155,7 @@ def _preprocess_payload(payload: Union[Dict[str, Any], List[Dict[str, Any]]]) ->
     df = df.replace({pd.NA: np.nan})
     return df
 
+
 # -----------------------------
 # Pydantic models
 # -----------------------------
@@ -155,6 +163,7 @@ class PredictResponse(BaseModel):
     model_version: str = Field(..., description="Model version (RUN_ID or 'local'/'dummy')")
     predictions: List[int] = Field(..., description="Predicted class labels (1 = Yes, 0 = No)")
     probabilities: List[float] = Field(..., description="Probability for class 1 (treatment=Yes)")
+
 
 # -----------------------------
 # Model loading strategies
@@ -171,6 +180,7 @@ def _try_load_local_model() -> Optional[mlflow.pyfunc.PyFuncModel]:
         print(f"[startup] Local model load failed from {MODEL_URI}: {e}")
         return None
 
+
 def _try_load_mlflow_model(run_id: str) -> Optional[mlflow.pyfunc.PyFuncModel]:
     if not run_id:
         return None
@@ -183,6 +193,7 @@ def _try_load_mlflow_model(run_id: str) -> Optional[mlflow.pyfunc.PyFuncModel]:
     except Exception as e:
         print(f"[startup] MLflow model load failed for run {run_id}: {e}")
         return None
+
 
 def _load_schema() -> Dict[str, Any]:
     s = _load_schema_from_file(SCHEMA_PATH)
@@ -197,6 +208,7 @@ def _load_schema() -> Dict[str, Any]:
     print("[startup] No schema found; API will accept provided columns")
     return {}
 
+
 # -----------------------------
 # App lifecycle
 # -----------------------------
@@ -206,34 +218,36 @@ async def lifespan(app: FastAPI):
 
     RUN_ID = _load_run_id()
 
-    # Try local -> MLflow (if RUN_ID) -> Dummy
     model = _try_load_local_model()
     if model is None and RUN_ID:
         model = _try_load_mlflow_model(RUN_ID)
     if model is None and ALLOW_DUMMY == "1":
         model = _DummyModel()
-        RUN_ID_local = RUN_ID or "dummy"
-        print(f"[startup] Using DUMMY model (set ALLOW_DUMMY=0 to disable), run_id={RUN_ID_local}")
+        print(f"[startup] Using DUMMY model (set ALLOW_DUMMY=0 to disable)")
 
     schema = _load_schema()
     expected_columns = _compute_expected_columns(schema)
     numeric_features_g, categorical_features_g = _extract_num_cat(schema)
+
     if expected_columns:
         print(f"[startup] Using {len(expected_columns)} expected columns from schema")
     if numeric_features_g or categorical_features_g:
         print(f"[startup] numeric_features: {len(numeric_features_g)} | categorical_features: {len(categorical_features_g)}")
+
     yield
 
+
+# -----------------------------
+# App & endpoints
+# -----------------------------
 app = FastAPI(
     title="Mental Health Treatment Predictor",
     description="Predicts treatment need (Yes/No) from the mental health survey using a trained sklearn Pipeline.",
-    version="1.3.0",
+    version="1.3.1",
     lifespan=lifespan,
 )
 
-# -----------------------------
-# Endpoints
-# -----------------------------
+
 @app.get("/")
 def root():
     return {
@@ -243,12 +257,16 @@ def root():
         "has_schema": bool(schema),
     }
 
+
 @app.get("/health")
 def health():
     ok = model is not None
-    return {"status": "ok" if ok else "not_ready",
-            "run_id": RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
-            "has_schema": bool(schema)}
+    return {
+        "status": "ok" if ok else "not_ready",
+        "run_id": RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
+        "has_schema": bool(schema),
+    }
+
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(payload: Dict[str, Any] = Body(...)):
@@ -264,8 +282,12 @@ def predict(payload: Dict[str, Any] = Body(...)):
             proba = [float(p) for p in preds]
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Inference failed: {e}")
-    return PredictResponse(model_version=RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
-                           predictions=preds, probabilities=proba)
+    return PredictResponse(
+        model_version=RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
+        predictions=preds,
+        probabilities=proba,
+    )
+
 
 @app.post("/predict_batch", response_model=PredictResponse)
 def predict_batch(payload: List[Dict[str, Any]] = Body(...)):
@@ -281,8 +303,12 @@ def predict_batch(payload: List[Dict[str, Any]] = Body(...)):
             proba = [float(p) for p in preds]
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Inference failed: {e}")
-    return PredictResponse(model_version=RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
-                           predictions=preds, probabilities=proba)
+    return PredictResponse(
+        model_version=RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
+        predictions=preds,
+        probabilities=proba,
+    )
+
 
 if __name__ == "__main__":
     import uvicorn
