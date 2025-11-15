@@ -12,7 +12,6 @@ or simply:
 """
 
 import sys
-import json
 import requests
 
 BASE_URL = "http://localhost:9696"
@@ -86,18 +85,23 @@ if __name__ == "__main__":
     # lightweight runner
     failures = 0
     try:
-        test_health_endpoint(); print("✓ /health")
+        test_health_endpoint()
+        print("✓ /health")
     except AssertionError as e:
-        failures += 1; print("✗ /health:", e, file=sys.stderr)
+        failures += 1
+        print("✗ /health:", e, file=sys.stderr)
 
     try:
         test_predict_single(); print("✓ /predict (single)")
     except AssertionError as e:
-        failures += 1; print("✗ /predict (single):", e, file=sys.stderr)
+        failures += 1
+        print("✗ /predict (single):", e, file=sys.stderr)
 
     try:
-        test_predict_batch(); print("✓ /predict_batch")
+        test_predict_batch()
+        print("✓ /predict_batch")
     except AssertionError as e:
-        failures += 1; print("✗ /predict_batch:", e, file=sys.stderr)
+        failures += 1
+        print("✗ /predict_batch:", e, file=sys.stderr)
 
     sys.exit(1 if failures else 0)
