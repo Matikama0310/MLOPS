@@ -223,7 +223,7 @@ async def lifespan(app: FastAPI):
         model = _try_load_mlflow_model(RUN_ID)
     if model is None and ALLOW_DUMMY == "1":
         model = _DummyModel()
-        print(f"[startup] Using DUMMY model (set ALLOW_DUMMY=0 to disable)")
+        print("[startup] Using DUMMY model (set ALLOW_DUMMY=0 to disable)")
 
     schema = _load_schema()
     expected_columns = _compute_expected_columns(schema)
