@@ -1,17 +1,17 @@
 name: Train
 
 on:
-  workflow_call:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   train:
     runs-on: ubuntu-latest
 
     env:
-      # Use file-based MLflow tracking in CI (no server needed)
+      # Log to a local MLflow file store (no server required)
       MLFLOW_TRACKING_URI: file:./mlruns
-      # Kaggle credentials pulled from repo Secrets
+      # Kaggle credentials from repo secrets (configure these in GitHub → Settings → Secrets and variables → Actions)
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
       KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
 
@@ -24,20 +24,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/3-cicd/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
       - name: Install dependencies
+        # Keep it simple; install kaggle & mlflow even if not in your requirements
         run: |
-          python -m pip install --upgrade pip
-          # prefer project-specific requirements if you have them
           if [ -f 3-cicd/requirements.txt ]; then pip install -r 3-cicd/requirements.txt; fi
-          # ensure kaggle + mlflow exist even if not in requirements.txt
           pip install kaggle mlflow
 
       - name: Configure Kaggle credentials
@@ -46,36 +39,28 @@ jobs:
           printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
 
-      - name: Show MLflow tracking URI
-        run: |
-          echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
-          python - << 'PY'
-import mlflow
-print("mlflow.get_tracking_uri():", mlflow.get_tracking_uri())
-PY
-
-      # Optional: helpful during setup, lists available files in the dataset
-      # - name: List files in Kaggle dataset
-      #   run: kaggle datasets files osmi/mental-health-in-tech-survey
-
       - name: Train model (Kaggle-only)
         working-directory: 3-cicd
         run: |
-          # Your train.py defaults to the 'survey' dataset and robustly picks the CSV.
-          # You can omit --kaggle_file to let it prefer *survey*; leaving it here is fine too.
           python train.py \
             --kaggle_slug osmi/mental-health-in-tech-survey \
             --kaggle_file survey.csv \
             --experiment mental-health-tech-prediction
 
+      - name: Show MLflow tracking URI
+        # This is plain bash + one-liner Python (no heredoc), so VS Code won't complain
+        run: |
+          echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
+          python -c "import mlflow; print('mlflow.get_tracking_uri():', mlflow.get_tracking_uri())"
+
       - name: Verify artifacts
         run: |
           echo "----- run_id.txt -----"
-          cat 3-cicd/run_id.txt
+          test -f 3-cicd/run_id.txt && cat 3-cicd/run_id.txt || echo "run_id.txt not found"
           echo "----- training_schema.json (first 40 lines) -----"
-          head -n 40 3-cicd/training_schema.json || true
-          echo "----- mlruns tree (depth 3) -----"
-          find mlruns -maxdepth 3 -type d -print | head -n 200 || true
+          test -f 3-cicd/training_schema.json && head -n 40 3-cicd/training_schema.json || echo "training_schema.json not found"
+          echo "----- mlruns exists? -----"
+          test -d mlruns && find mlruns -maxdepth 3 -type d -print | head -n 200 || echo "mlruns directory not found"
 
       - name: Upload trained artifacts
         uses: actions/upload-artifact@v4
