@@ -3,19 +3,17 @@
 Mental Health Training Script — Kaggle-only (with explicit cleanup)
 
 - Downloads data ONLY from Kaggle (no local CSV fallback).
+- Default dataset slug: osmi/mental-health-in-tech-survey (override with --kaggle_slug if needed).
 - Uses a TemporaryDirectory for all Kaggle files and ensures cleanup.
-- Same preprocessing as before (Gender cleaning + ColumnTransformer).
+- Preprocessing: Gender cleaning + ColumnTransformer (impute+scale numeric, impute+one-hot categorical).
 - Optional retained features file; trains on FULL data (no validation).
 - Logs sklearn Pipeline to MLflow + writes training_schema.json and run_id.txt.
 
-Usage:
+Usage (example):
     pip install kaggle
     # Put kaggle.json in ~/.kaggle/ (macOS/Linux) or C:\\Users\\<you>\\.kaggle\\ (Windows)
-    # or set env vars KAGGLE_USERNAME / KAGGLE_KEY
-
-    python train_kaggle_only_clean.py \
-        --kaggle_slug osmi/mental-health-in-tech-2016 \
-        --kaggle_file mental-heath-in-tech-2016_20161114.csv \
+    # or export KAGGLE_USERNAME / KAGGLE_KEY
+    python train.py --kaggle_file survey.csv \
         --experiment mental-health-tech-prediction \
         --mlflow_uri http://127.0.0.1:5000
 """
@@ -146,6 +144,18 @@ def _have_kaggle_cli() -> bool:
     return which("kaggle") is not None
 
 
+def _ensure_kaggle_credentials():
+    cfg_path = Path.home() / ".kaggle" / "kaggle.json"
+    has_file = cfg_path.exists()
+    has_env = bool(os.getenv("KAGGLE_USERNAME") and os.getenv("KAGGLE_KEY"))
+    if not (has_file or has_env):
+        raise RuntimeError(
+            "Kaggle credentials not found.\n"
+            "Add C:\\Users\\<you>\\.kaggle\\kaggle.json (Windows) or ~/.kaggle/kaggle.json (macOS/Linux), "
+            "or set KAGGLE_USERNAME and KAGGLE_KEY environment variables."
+        )
+
+
 def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[pd.DataFrame, str]:
     """
     Download the Kaggle dataset into a TemporaryDirectory and return (DataFrame, chosen_filename).
@@ -153,6 +163,7 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
     """
     if not _have_kaggle_cli():
         raise RuntimeError("Kaggle CLI not found. Install with `pip install kaggle` and configure your API token.")
+    _ensure_kaggle_credentials()
 
     tmpdir_obj = tempfile.TemporaryDirectory()
     tmpdir = Path(tmpdir_obj.name)
@@ -184,7 +195,7 @@ def _kaggle_download_to_tmp(slug: str, preferred_file: Optional[str]) -> Tuple[p
                     )
                 chosen = matches[0]
         else:
-            surveyish = [p for p in candidates if "mental-heath-in-tech-2016_20161114" in p.name.lower()]
+            surveyish = [p for p in candidates if "survey" in p.name.lower()]
             chosen = surveyish[0] if surveyish else candidates[0]
 
         df = pd.read_csv(chosen)
@@ -210,7 +221,14 @@ def main():
     parser.add_argument("--best_params_file", default="best_params.json", help="Optional JSON with tuned hyperparams")
     parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
     parser.add_argument("--output_runid", default="run_id.txt", help="Where to write MLflow run_id")
-    parser.add_argument("--kaggle_slug", default="osmi/mental-health-in-tech-2016", required=False, help="Kaggle dataset slug like 'osmi/mental-health-in-tech-2016'")
+
+    # Default to your Kaggle dataset; you can override via CLI
+    parser.add_argument(
+        "--kaggle_slug",
+        default="osmi/mental-health-in-tech-survey",
+        required=False,
+        help="Kaggle dataset slug (default: osmi/mental-health-in-tech-survey)"
+    )
     parser.add_argument("--kaggle_file", default="", help="Optional CSV filename inside the Kaggle dataset")
     args = parser.parse_args()
 
