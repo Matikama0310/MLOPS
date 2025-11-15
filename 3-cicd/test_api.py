@@ -92,7 +92,8 @@ if __name__ == "__main__":
         print("✗ /health:", e, file=sys.stderr)
 
     try:
-        test_predict_single(); print("✓ /predict (single)")
+        test_predict_single()
+        print("✓ /predict (single)")
     except AssertionError as e:
         failures += 1
         print("✗ /predict (single):", e, file=sys.stderr)
