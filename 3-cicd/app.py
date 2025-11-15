@@ -6,6 +6,7 @@ FastAPI inference service for the Mental Health survey classifier.
 - Fall back to MLflow only if RUN_ID is set.
 - If no model is found, load a DUMMY model (disable with ALLOW_DUMMY=0).
 - Startup never crashes; /health reports readiness as 'ok' or 'not_ready'.
+- Now includes example payloads in the OpenAPI docs and a /examples endpoint.
 """
 
 import os
@@ -22,6 +23,50 @@ from pydantic import BaseModel, Field
 import mlflow
 import mlflow.pyfunc
 from mlflow.artifacts import download_artifacts
+
+
+# -----------------------------
+# Example payloads (used in docs and /examples)
+# -----------------------------
+SAMPLE_SINGLE: Dict[str, Any] = {
+    "Age": 33,
+    "Gender": "Male",
+    "self_employed": "No",
+    "family_history": "No",
+    "benefits": "Yes",
+    "work_interfere": "Sometimes",
+    "remote_work": "Yes",
+    "no_employees": "6-25",
+    "tech_company": "Yes",
+    "anonymity": "Yes"
+}
+
+SAMPLE_BATCH: List[Dict[str, Any]] = [
+    {
+        "Age": 28,
+        "Gender": "F",
+        "self_employed": "No",
+        "family_history": "No",
+        "benefits": "No",
+        "work_interfere": "Rarely",
+        "remote_work": "No",
+        "no_employees": "26-100",
+        "tech_company": "Yes",
+        "anonymity": "No"
+    },
+    {
+        "Age": 41,
+        "Gender": "Other",
+        "self_employed": "Yes",
+        "family_history": "Yes",
+        "benefits": "Don't know",
+        "work_interfere": "Often",
+        "remote_work": "Yes",
+        "no_employees": "100-500",
+        "tech_company": "No",
+        "anonymity": "Yes"
+    }
+]
 
 
 # -----------------------------
@@ -243,7 +288,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Mental Health Treatment Predictor",
     description="Predicts treatment need (Yes/No) from the mental health survey using a trained sklearn Pipeline.",
-    version="1.3.1",
+    version="1.4.0",
     lifespan=lifespan,
 )
 
@@ -255,6 +300,11 @@ def root():
         "run_id": RUN_ID or ("dummy" if isinstance(model, _DummyModel) else "local"),
         "model_uri": MODEL_URI,
         "has_schema": bool(schema),
+        "try_endpoints": {
+            "single": "/predict",
+            "batch": "/predict_batch",
+            "examples": "/examples"
+        }
     }
 
 
@@ -268,8 +318,33 @@ def health():
     }
 
 
+@app.get("/examples")
+def examples():
+    """Return example payloads and ready-to-run curl commands."""
+    single_json = json.dumps(SAMPLE_SINGLE)
+    batch_json = json.dumps(SAMPLE_BATCH)
+    curl_single = (
+        "curl -X POST http://localhost:8000/predict "
+        "-H 'Content-Type: application/json' "
+        f"-d '{single_json}'"
+    )
+    curl_batch = (
+        "curl -X POST http://localhost:8000/predict_batch "
+        "-H 'Content-Type: application/json' "
+        f"-d '{batch_json}'"
+    )
+    return {
+        "single_payload": SAMPLE_SINGLE,
+        "batch_payload": SAMPLE_BATCH,
+        "curl": {
+            "single": curl_single,
+            "batch": curl_batch
+        }
+    }
+
+
 @app.post("/predict", response_model=PredictResponse)
-def predict(payload: Dict[str, Any] = Body(...)):
+def predict(payload: Dict[str, Any] = Body(..., example=SAMPLE_SINGLE)):
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded yet")
     df = _preprocess_payload(payload)
@@ -290,7 +365,7 @@ def predict(payload: Dict[str, Any] = Body(...)):
 
 
 @app.post("/predict_batch", response_model=PredictResponse)
-def predict_batch(payload: List[Dict[str, Any]] = Body(...)):
+def predict_batch(payload: List[Dict[str, Any]] = Body(..., example=SAMPLE_BATCH)):
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded yet")
     df = _preprocess_payload(payload)
