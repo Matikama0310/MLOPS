@@ -55,7 +55,7 @@ jobs:
           sleep 20
           curl -f http://localhost:9696/health || (docker logs mental-app && exit 1)
           pytest -q test_api.py
-          docker stop metnal-app && docker rm mental-app
+          docker stop mental-app && docker rm mental-app
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
