@@ -18,13 +18,14 @@ import zipfile
 import shutil
 import tempfile
 import subprocess
+import urllib.parse
 from pathlib import Path
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 # ---- compat OneHotEncoder across sklearn versions ----
 try:
@@ -37,14 +38,23 @@ except TypeError:
 
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
-    confusion_matrix, recall_score, precision_score,
-    f1_score, roc_auc_score
+    confusion_matrix,
+    recall_score,
+    precision_score,
+    f1_score,
+    roc_auc_score,
 )
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+
 import mlflow
 import mlflow.sklearn
+from mlflow.tracking import MlflowClient
+try:
+    from mlflow.artifacts import download_artifacts as mlflow_download_artifacts
+except Exception:  # pragma: no cover - compatibility across MLflow versions
+    mlflow_download_artifacts = None
 
 # ==================== CONFIG ====================
 KAGGLE_DATASET = "osmi/mental-health-in-tech-survey"
@@ -54,18 +64,18 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
 TEST_SIZE = 0.20
 RANDOM_STATE = 42
 
+
 # ==================== HELPERS ====================
 def clean_gender(gen):
     """Clean gender values."""
     s = str(gen).strip().lower()
     s = re.sub(r"[\W_]+", " ", s).strip()
-    if s in {"m", "male", "man", "make", "mal", "malr",
-             "msle", "masc", "mail", "boy"}:
+    if s in {"m", "male", "man", "make", "mal", "malr", "msle", "masc", "mail", "boy"}:
         return "Male"
-    if s in {"f", "female", "woman", "femake", "femail",
-             "femme", "girl"}:
+    if s in {"f", "female", "woman", "femake", "femail", "femme", "girl"}:
         return "Female"
     return "Other"
+
 
 def load_best_config():
     """Load best configuration from experiment."""
@@ -100,12 +110,13 @@ def load_best_config():
 
     return config
 
+
 def create_model(model_name, hyperparameters):
     """Create model instance from config."""
     models = {
         'LogisticRegression': LogisticRegression,
         'RandomForest': RandomForestClassifier,
-        'XGBoost': XGBClassifier
+        'XGBoost': XGBClassifier,
     }
 
     model_class = models.get(model_name)
@@ -114,19 +125,18 @@ def create_model(model_name, hyperparameters):
 
     return model_class(**hyperparameters, random_state=RANDOM_STATE)
 
+
 def build_preprocessor(X):
     """Build preprocessing pipeline."""
     num_cols = X.select_dtypes(include=["number", "bool"]).columns.tolist()
-    cat_cols = X.select_dtypes(
-        include=["object", "category"]
-    ).columns.tolist()
+    cat_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
 
     num_pipe = Pipeline([
         ("imp", SimpleImputer(strategy="median")),
         ("sc", StandardScaler()),
     ])
-    # Use module-level _ohe defined for sklearn compatibility
 
+    # Use module-level _ohe defined for sklearn compatibility
     cat_pipe = Pipeline([
         ("imp", SimpleImputer(strategy="most_frequent")),
         ("ohe", _ohe),
@@ -137,6 +147,7 @@ def build_preprocessor(X):
         ("cat", cat_pipe, cat_cols),
     ], remainder="drop")
 
+
 def load_from_kaggle():
     """Download dataset from Kaggle."""
     from shutil import which
@@ -145,9 +156,7 @@ def load_from_kaggle():
         raise RuntimeError("Install Kaggle CLI: pip install kaggle")
 
     cfg = Path.home() / ".kaggle" / "kaggle.json"
-    if not cfg.exists() and not (
-        os.getenv("KAGGLE_USERNAME") and os.getenv("KAGGLE_KEY")
-    ):
+    if not cfg.exists() and not (os.getenv("KAGGLE_USERNAME") and os.getenv("KAGGLE_KEY")):
         raise RuntimeError(
             "Kaggle credentials not found. "
             "Create ~/.kaggle/kaggle.json or set "
@@ -159,7 +168,7 @@ def load_from_kaggle():
     try:
         subprocess.check_call([
             "kaggle", "datasets", "download", "-d", KAGGLE_DATASET,
-            "-p", str(tmpdir), "-q"
+            "-p", str(tmpdir), "-q",
         ])
         for z in tmpdir.glob("*.zip"):
             with zipfile.ZipFile(z, "r") as zf:
@@ -180,18 +189,10 @@ def load_from_kaggle():
         except Exception:
             shutil.rmtree(tmpdir, ignore_errors=True)
 
-from pathlib import Path
-import shutil
-import mlflow
-import urllib.parse
-from mlflow.tracking import MlflowClient
-try:
-    from mlflow.artifacts import download_artifacts as mlflow_download_artifacts
-except Exception:  # pragma: no cover - compatibility across MLflow versions
-    mlflow_download_artifacts = None
 
 def copy_model_to_local_dir(run_id):
     """Copy the 'model' artifact from a given MLflow run into ./models/model, version-agnostic.
+
     Tries, in order:
       1) mlflow.artifacts.download_artifacts with a runs:/ URI (if available)
       2) MlflowClient().download_artifacts(run_id, "model", ...)
@@ -208,7 +209,9 @@ def copy_model_to_local_dir(run_id):
     if mlflow_download_artifacts is not None:
         try:
             # MLflow >= 2.x signature: (artifact_uri, dst_path=None)
-            local_path = mlflow_download_artifacts(artifact_uri=f"runs:/{run_id}/model", dst_path=str(models_dir))
+            local_path = mlflow_download_artifacts(
+                artifact_uri=f"runs:/{run_id}/model", dst_path=str(models_dir)
+            )
             print(f"Destination: {local_path}")
             return Path(local_path)
         except TypeError:
@@ -257,6 +260,7 @@ def copy_model_to_local_dir(run_id):
     print("✅ Model copied successfully")
     return model_dest
 
+
 def train_production_model(config):
     """Train final production model with MLflow tracking."""
 
@@ -272,7 +276,7 @@ def train_production_model(config):
     # Preprocess
     target_col = "treatment"
     features_to_drop = [
-        'Timestamp', 'Country', 'state', 'comments', target_col
+        'Timestamp', 'Country', 'state', 'comments', target_col,
     ]
 
     y = df[target_col].map({"Yes": 1, "No": 0}).astype(int)
@@ -311,13 +315,13 @@ def train_production_model(config):
         # Create and train model
         model = create_model(
             config['model']['name'],
-            config['model']['hyperparameters']
+            config['model']['hyperparameters'],
         )
 
         preprocessor = build_preprocessor(X_train)
         pipe = Pipeline([
             ('preprocess', preprocessor),
-            ('model', model)
+            ('model', model),
         ])
 
         print("\nTraining model...")
@@ -371,7 +375,7 @@ def train_production_model(config):
         mlflow.sklearn.log_model(
             pipe,
             artifact_path='model',
-            registered_model_name='mental_health_classifier'
+            registered_model_name='mental_health_classifier',
         )
 
         print("\n✅ Model logged to MLflow")
@@ -380,6 +384,7 @@ def train_production_model(config):
         copy_model_to_local_dir(run_id)
 
         return run_id, metrics
+
 
 def main():
     """Main training pipeline."""
@@ -409,6 +414,7 @@ def main():
     print("\n🚀 Ready for deployment with app.py")
 
     return run_id
+
 
 if __name__ == "__main__":
     main()
