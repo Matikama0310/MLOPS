@@ -34,7 +34,23 @@ jobs:
           mkdir -p ~/.kaggle
           printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
-          echo "✅ Kaggle credentials configured"
+          
+          # Verify the file was created
+          if [ -f ~/.kaggle/kaggle.json ]; then
+            echo "✅ Kaggle credentials configured at ~/.kaggle/kaggle.json"
+            ls -la ~/.kaggle/
+          else
+            echo "❌ Failed to create kaggle.json"
+            exit 1
+          fi
+          
+          # Verify environment variables are set
+          if [ -z "$KAGGLE_USERNAME" ] || [ -z "$KAGGLE_KEY" ]; then
+            echo "❌ KAGGLE_USERNAME or KAGGLE_KEY environment variables are not set"
+            exit 1
+          else
+            echo "✅ Environment variables KAGGLE_USERNAME and KAGGLE_KEY are set"
+          fi
 
       - name: Verify best_config.json exists
         working-directory: 3-cicd
@@ -45,9 +61,46 @@ jobs:
           fi
           echo "✅ best_config.json found"
 
+      - name: Verify Kaggle setup before training
+        run: |
+          echo "=== Verifying Kaggle Configuration ==="
+          
+          # Check environment variables
+          if [ -z "$KAGGLE_USERNAME" ]; then
+            echo "❌ KAGGLE_USERNAME is not set"
+            exit 1
+          fi
+          if [ -z "$KAGGLE_KEY" ]; then
+            echo "❌ KAGGLE_KEY is not set"
+            exit 1
+          fi
+          echo "✅ KAGGLE_USERNAME: $KAGGLE_USERNAME"
+          echo "✅ KAGGLE_KEY: [hidden]"
+          
+          # Check kaggle.json file
+          if [ ! -f ~/.kaggle/kaggle.json ]; then
+            echo "❌ ~/.kaggle/kaggle.json not found"
+            exit 1
+          fi
+          echo "✅ ~/.kaggle/kaggle.json exists"
+          
+          # Check file permissions
+          PERMS=$(stat -c %a ~/.kaggle/kaggle.json)
+          if [ "$PERMS" != "600" ]; then
+            echo "⚠️  Warning: kaggle.json permissions are $PERMS (should be 600)"
+            chmod 600 ~/.kaggle/kaggle.json
+          fi
+          echo "✅ File permissions: 600"
+          
+          echo "=== Kaggle configuration verified ==="
+
       - name: Train model
         working-directory: 3-cicd
         run: |
+          # Ensure Kaggle credentials are available as environment variables
+          export KAGGLE_USERNAME="${{ secrets.KAGGLE_USERNAME }}"
+          export KAGGLE_KEY="${{ secrets.KAGGLE_KEY }}"
+          
           # Train the model - it will create run_id.txt and training_schema.json
           python train.py
           echo "✅ Training complete"
