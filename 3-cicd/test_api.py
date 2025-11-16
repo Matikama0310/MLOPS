@@ -17,7 +17,7 @@ def load_selected_features():
         with open('best_config.json', 'r') as f:
             config = json.load(f)
             return config['features']['selected']
-    except:
+    except Exception:
         # Fallback to features we know are selected
         return [
             "work_interfere", "family_history", "care_options",
@@ -66,8 +66,8 @@ def test_predict_single():
     assert isinstance(preds, list) and len(preds) == 1
     assert preds[0] in (0, 1), "prediction must be 0 or 1"
     _assert_probabilities(proba)
-    
-    print(f"✓ Prediction: {preds[0]} (prob: {proba[0]:.3f})")
+
+    print(f"✅ Prediction: {preds[0]} (prob: {proba[0]:.3f})")
 
 
 def test_predict_batch():
@@ -107,8 +107,8 @@ def test_predict_batch():
     assert isinstance(preds, list) and len(preds) == len(payload)
     assert all(p in (0, 1) for p in preds), "all predictions must be 0 or 1"
     _assert_probabilities(proba)
-    
-    print(f"✓ Batch predictions: {preds}")
+
+    print(f"✅ Batch predictions: {preds}")
 
 
 def test_with_minimal_features():
@@ -121,46 +121,46 @@ def test_with_minimal_features():
     assert resp.status_code == 200, f"Error: {resp.status_code} - {resp.text}"
     data = resp.json()
     assert "predictions" in data
-    print(f"✓ Minimal payload works: {data['predictions'][0]}")
+    print(f"✅ Minimal payload works: {data['predictions'][0]}")
 
 
 if __name__ == "__main__":
     failures = 0
-    
+
     print("\n🧪 Testing Mental Health API...")
     print(f"Target: {BASE_URL}\n")
-    
+
     try:
         test_health_endpoint()
-        print("✓ /health")
+        print("✅ /health")
     except AssertionError as e:
         failures += 1
-        print(f"✗ /health: {e}", file=sys.stderr)
+        print(f"❌ /health: {e}", file=sys.stderr)
 
     try:
         test_predict_single()
-        print("✓ /predict (single)")
+        print("✅ /predict (single)")
     except AssertionError as e:
         failures += 1
-        print(f"✗ /predict (single): {e}", file=sys.stderr)
+        print(f"❌ /predict (single): {e}", file=sys.stderr)
 
     try:
         test_predict_batch()
-        print("✓ /predict_batch")
+        print("✅ /predict_batch")
     except AssertionError as e:
         failures += 1
-        print(f"✗ /predict_batch: {e}", file=sys.stderr)
-    
+        print(f"❌ /predict_batch: {e}", file=sys.stderr)
+
     try:
         test_with_minimal_features()
-        print("✓ /predict (minimal)")
+        print("✅ /predict (minimal)")
     except AssertionError as e:
         failures += 1
-        print(f"✗ /predict (minimal): {e}", file=sys.stderr)
+        print(f"❌ /predict (minimal): {e}", file=sys.stderr)
 
     if failures == 0:
-        print(f"\n✅ All tests passed!")
+        print("\n✅ All tests passed!")
     else:
         print(f"\n❌ {failures} test(s) failed")
-    
+
     sys.exit(1 if failures else 0)
