@@ -1,5 +1,3 @@
-# .github/workflows/ci-cd.yml
-
 name: CI/CD Pipeline
 
 on:
@@ -16,6 +14,7 @@ jobs:
   call-train:
     name: "Train Model"
     uses: ./.github/workflows/train.yml
+    secrets: inherit
 
   build-test-deploy:
     name: "Build, Test, and Deploy"
@@ -41,21 +40,53 @@ jobs:
           path: 3-cicd/
 
       - name: Verify downloaded artifact
-        run: ls -R 3-cicd
+        run: |
+          echo "Downloaded artifacts:"
+          ls -lR 3-cicd/
+          
+          echo "Checking for required files:"
+          test -f 3-cicd/run_id.txt && echo "✅ run_id.txt found" || echo "❌ run_id.txt missing"
+          test -f 3-cicd/training_schema.json && echo "✅ training_schema.json found" || echo "❌ training_schema.json missing"
+          test -d 3-cicd/models && echo "✅ models/ directory found" || echo "❌ models/ directory missing"
 
       - name: Lint
         working-directory: 3-cicd
         run: flake8 . --max-line-length=100 --ignore=E501
 
-      - name: Build & Test Docker image
+      - name: Build Docker image
+        working-directory: 3-cicd
+        run: docker build -t mental-health-app .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 9696:9696 --name mental-app mental-health-app
+          echo "Container started, waiting for service to be ready..."
+          sleep 20
+
+      - name: Check service health
+        run: |
+          echo "Checking health endpoint..."
+          curl -f http://localhost:9696/health || (echo "Health check failed" && docker logs mental-app && exit 1)
+          echo "✅ Health check passed"
+
+      - name: Run API tests
         working-directory: 3-cicd
         run: |
-          docker build -t mental-health-app .
-          docker run -d -p 9696:9696 --name mental-app mental-health-app
-          sleep 20
-          curl -f http://localhost:9696/health || (docker logs mental-app && exit 1)
-          pytest -q test_api.py
-          docker stop mental-app && docker rm mental-app
+          # Update BASE_URL in test to use port 9696
+          sed -i 's|http://localhost:8000|http://localhost:9696|g' test_api.py
+          
+          # Run tests
+          python test_api.py || (docker logs mental-app && exit 1)
+
+      - name: Show container logs
+        if: always()
+        run: docker logs mental-app
+
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop mental-app || true
+          docker rm mental-app || true
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -69,7 +100,7 @@ jobs:
           IMAGE_ID="ghcr.io/${{ github.repository }}"
           IMAGE_ID=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
           
-          # Use the first 7 characters of the commit SHA as the version tag.
+          # Use the first 7 characters of the commit SHA as the version tag
           VERSION=$(echo "${{ github.sha }}" | cut -c1-7)
           
           echo "Pushing image: $IMAGE_ID with tags: latest, $VERSION"
@@ -83,3 +114,7 @@ jobs:
           # Push both tags
           docker push "$IMAGE_ID:$VERSION"
           docker push "$IMAGE_ID:latest"
+          
+          echo "✅ Image pushed successfully"
+          echo "Image available at: $IMAGE_ID:$VERSION"
+          echo "Image available at: $IMAGE_ID:latest"

@@ -11,7 +11,7 @@ jobs:
     env:
       # Log to a local MLflow file store (no server required)
       MLFLOW_TRACKING_URI: file:./mlruns
-      # Kaggle credentials from repo secrets (configure these in GitHub → Settings → Secrets and variables → Actions)
+      # Kaggle credentials from repo secrets
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
       KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
 
@@ -28,7 +28,6 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Install dependencies
-        # Keep it simple; install kaggle & mlflow even if not in your requirements
         run: |
           if [ -f 3-cicd/requirements.txt ]; then pip install -r 3-cicd/requirements.txt; fi
           pip install kaggle mlflow
@@ -39,16 +38,22 @@ jobs:
           printf '{"username":"%s","key":"%s"}' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
 
-      - name: Train model (Kaggle-only)
+      - name: Verify best_config.json exists
         working-directory: 3-cicd
         run: |
-          python train.py \
-            --kaggle_slug osmi/mental-health-in-tech-survey \
-            --kaggle_file survey.csv \
-            --experiment mental-health-tech-prediction
+          if [ ! -f best_config.json ]; then
+            echo "Error: best_config.json not found!"
+            echo "This file should be committed to the repository."
+            exit 1
+          fi
+          echo "✅ best_config.json found"
+          cat best_config.json
+
+      - name: Train model
+        working-directory: 3-cicd
+        run: python train.py
 
       - name: Show MLflow tracking URI
-        # This is plain bash + one-liner Python (no heredoc), so VS Code won't complain
         run: |
           echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
           python -c "import mlflow; print('mlflow.get_tracking_uri():', mlflow.get_tracking_uri())"
@@ -56,11 +61,51 @@ jobs:
       - name: Verify artifacts
         run: |
           echo "----- run_id.txt -----"
-          test -f 3-cicd/run_id.txt && cat 3-cicd/run_id.txt || echo "run_id.txt not found"
-          echo "----- training_schema.json (first 40 lines) -----"
-          test -f 3-cicd/training_schema.json && head -n 40 3-cicd/training_schema.json || echo "training_schema.json not found"
-          echo "----- mlruns exists? -----"
-          test -d mlruns && find mlruns -maxdepth 3 -type d -print | head -n 200 || echo "mlruns directory not found"
+          if [ -f 3-cicd/run_id.txt ]; then
+            cat 3-cicd/run_id.txt
+          else
+            echo "❌ run_id.txt not found"
+            exit 1
+          fi
+          
+          echo "----- training_schema.json -----"
+          if [ -f 3-cicd/training_schema.json ]; then
+            head -n 40 3-cicd/training_schema.json
+          else
+            echo "❌ training_schema.json not found"
+            exit 1
+          fi
+          
+          echo "----- mlruns directory -----"
+          if [ -d mlruns ]; then
+            find mlruns -maxdepth 3 -type f | head -n 20
+          else
+            echo "❌ mlruns directory not found"
+            exit 1
+          fi
+
+      - name: Package model artifacts
+        working-directory: 3-cicd
+        run: |
+          RUN_ID=$(cat run_id.txt)
+          echo "Packaging model from run: $RUN_ID"
+          
+          # Create models directory
+          mkdir -p models
+          
+          # Copy model from mlruns to models directory
+          if [ -d "../mlruns" ]; then
+            # Find the model directory
+            MODEL_PATH=$(find ../mlruns -name "model" -type d | grep "$RUN_ID" | head -n 1)
+            if [ -n "$MODEL_PATH" ]; then
+              echo "Found model at: $MODEL_PATH"
+              cp -r "$MODEL_PATH" models/
+              echo "✅ Model copied to models/model"
+            else
+              echo "❌ Model directory not found for run $RUN_ID"
+              exit 1
+            fi
+          fi
 
       - name: Upload trained artifacts
         uses: actions/upload-artifact@v4
@@ -69,6 +114,6 @@ jobs:
           path: |
             3-cicd/run_id.txt
             3-cicd/training_schema.json
-            mlruns/**/*
-          if-no-files-found: warn
+            3-cicd/models/
+          if-no-files-found: error
           retention-days: 7
