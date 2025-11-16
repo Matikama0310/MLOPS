@@ -176,6 +176,64 @@ def load_from_kaggle():
             shutil.rmtree(tmpdir, ignore_errors=True)
 
 
+def copy_model_to_local_dir(run_id):
+    """
+    Copy the trained model from MLflow to local models/ directory.
+    This allows the workflow to upload it as an artifact.
+    """
+    # Determine MLflow tracking URI path
+    tracking_uri = MLFLOW_TRACKING_URI
+    if tracking_uri.startswith("file:"):
+        mlruns_path = tracking_uri[5:]  # Remove 'file:' prefix
+    else:
+        mlruns_path = tracking_uri
+    
+    # Handle relative vs absolute paths
+    if mlruns_path.startswith("./"):
+        # Relative path from 3-cicd directory
+        mlruns_path = Path("..") / mlruns_path[2:]
+    else:
+        mlruns_path = Path(mlruns_path)
+    
+    # Path to the model in MLflow
+    model_source = mlruns_path / "0" / run_id / "artifacts" / "model"
+    
+    print(f"\n📦 Copying model to local directory...")
+    print(f"Source: {model_source}")
+    
+    if not model_source.exists():
+        raise FileNotFoundError(
+            f"Model not found at {model_source}\n"
+            f"MLflow may have stored it in a different location."
+        )
+    
+    # Create models/model directory
+    models_dir = Path("models")
+    models_dir.mkdir(exist_ok=True)
+    
+    # Remove old model if exists
+    model_dest = models_dir / "model"
+    if model_dest.exists():
+        shutil.rmtree(model_dest)
+    
+    # Copy the entire model directory
+    shutil.copytree(model_source, model_dest)
+    
+    print(f"Destination: {model_dest}")
+    print(f"✅ Model copied successfully")
+    
+    # Verify the copy
+    if not model_dest.exists():
+        raise RuntimeError("Model copy failed - destination not found")
+    
+    # List contents
+    print(f"\nModel directory contents:")
+    for item in model_dest.iterdir():
+        print(f"  - {item.name}")
+    
+    return model_dest
+
+
 def train_production_model(config):
     """Train final production model with MLflow tracking."""
 
@@ -295,6 +353,9 @@ def train_production_model(config):
 
         print("\n✅ Model logged to MLflow")
 
+        # Copy model to local directory for workflow artifact upload
+        copy_model_to_local_dir(run_id)
+
         return run_id, metrics
 
 
@@ -320,6 +381,7 @@ def main():
     print(f"\n✅ Run ID: {run_id}")
     print("✅ Run ID saved to: run_id.txt")
     print("✅ Schema saved to: training_schema.json")
+    print("✅ Model copied to: models/model/")
     print("\n📊 View in MLflow UI:")
     print(f"   mlflow ui --backend-store-uri {MLFLOW_TRACKING_URI}")
     print("\n🚀 Ready for deployment with app.py")
