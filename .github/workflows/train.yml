@@ -11,6 +11,7 @@ jobs:
     env:
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
       KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      MLFLOW_TRACKING_URI: file:./mlruns
 
     steps:
       - name: Checkout
@@ -47,27 +48,51 @@ jobs:
           # Train the model - it will create run_id.txt and training_schema.json
           python train.py
           echo "✅ Training complete"
+          
+          # Verify mlruns was created in root
+          if [ -d "../mlruns" ]; then
+            echo "✅ mlruns found in root directory"
+            RUN_ID=$(cat run_id.txt)
+            echo "Run ID: $RUN_ID"
+            
+            if [ -d "../mlruns/0/$RUN_ID" ]; then
+              echo "✅ Run directory exists"
+            else
+              echo "❌ Run directory not found"
+              exit 1
+            fi
+          else
+            echo "❌ mlruns directory not found in root"
+            ls -la ../ | grep mlruns || echo "No mlruns in parent directory"
+            exit 1
+          fi
 
       - name: Copy model artifacts from MLflow
-        working-directory: 3-cicd
         run: |
-          RUN_ID=$(cat run_id.txt)
+          RUN_ID=$(cat 3-cicd/run_id.txt)
           echo "Run ID: $RUN_ID"
           
           # Create models directory
-          mkdir -p models
+          mkdir -p 3-cicd/models
           
-          # MLflow stores models in: mlruns/0/{run_id}/artifacts/model/
-          MODEL_SOURCE="../mlruns/0/$RUN_ID/artifacts/model"
+          # MLflow stores models in root: mlruns/0/{run_id}/artifacts/model/
+          MODEL_SOURCE="mlruns/0/$RUN_ID/artifacts/model"
           
           if [ -d "$MODEL_SOURCE" ]; then
             echo "✅ Found model at: $MODEL_SOURCE"
-            cp -r "$MODEL_SOURCE" models/
-            echo "✅ Model copied to models/model/"
+            cp -r "$MODEL_SOURCE" 3-cicd/models/
+            echo "✅ Model copied to 3-cicd/models/model/"
           else
             echo "❌ Model not found at: $MODEL_SOURCE"
-            echo "Searching for model..."
-            find ../mlruns -name "model" -type d
+            echo ""
+            echo "Debugging - Current directory:"
+            pwd
+            echo ""
+            echo "Searching for mlruns..."
+            ls -la | grep mlruns || echo "mlruns not found in current directory"
+            echo ""
+            echo "Searching for model directories..."
+            find . -name "model" -type d 2>/dev/null | head -10 || echo "No model directories found"
             exit 1
           fi
 
