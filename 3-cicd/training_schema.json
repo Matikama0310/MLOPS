@@ -1,0 +1,34 @@
+{
+  "numeric_features": [],
+  "categorical_features": [
+    "work_interfere",
+    "family_history",
+    "care_options",
+    "supervisor",
+    "leave",
+    "Gender",
+    "obs_consequence",
+    "mental_health_interview",
+    "no_employees",
+    "coworkers",
+    "phys_health_interview",
+    "self_employed",
+    "mental_health_consequence"
+  ],
+  "retained_features": [
+    "work_interfere",
+    "family_history",
+    "care_options",
+    "supervisor",
+    "leave",
+    "Gender",
+    "obs_consequence",
+    "mental_health_interview",
+    "no_employees",
+    "coworkers",
+    "phys_health_interview",
+    "self_employed",
+    "mental_health_consequence"
+  ],
+  "target": "treatment"
+}
