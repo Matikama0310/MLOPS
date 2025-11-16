@@ -78,6 +78,26 @@ jobs:
             echo "❌ mlruns directory was not created"
             exit 1
           fi
+          
+          # Verify run_id was created
+          if [ -f run_id.txt ]; then
+            RUN_ID=$(cat run_id.txt)
+            echo "✅ Run ID created: $RUN_ID"
+            
+            # Check if MLflow logged the model
+            echo "Checking if model was logged to MLflow..."
+            if [ -d "${{ env.mlruns_path }}/0/$RUN_ID/artifacts/model" ]; then
+              echo "✅ Model artifacts found in MLflow"
+              ls -la "${{ env.mlruns_path }}/0/$RUN_ID/artifacts/model/"
+            else
+              echo "⚠️  Model artifacts not found at expected location"
+              echo "Searching for model artifacts..."
+              find "${{ env.mlruns_path }}" -name "model" -type d
+            fi
+          else
+            echo "❌ run_id.txt was not created"
+            exit 1
+          fi
 
       - name: Show MLflow tracking URI
         run: |
@@ -129,26 +149,61 @@ jobs:
           RUN_ID=$(cat 3-cicd/run_id.txt)
           echo "Packaging model from run: $RUN_ID"
           
+          # Debug: Show mlruns structure
+          echo "===== MLruns directory structure ====="
+          find mlruns -type d | sort
+          echo ""
+          
           # Create models directory in 3-cicd
           mkdir -p 3-cicd/models
           
-          # Find the model directory
-          MODEL_PATH=$(find mlruns -path "*/artifacts/model" -type d | grep "$RUN_ID" | head -n 1)
+          # Find the model directory - try multiple approaches
+          echo "Searching for model artifacts..."
           
-          if [ -n "$MODEL_PATH" ]; then
+          # Method 1: Direct path
+          if [ -d "mlruns/0/$RUN_ID/artifacts/model" ]; then
+            MODEL_PATH="mlruns/0/$RUN_ID/artifacts/model"
+            echo "✅ Found model using direct path: $MODEL_PATH"
+          else
+            # Method 2: Search in all experiments
+            MODEL_PATH=$(find mlruns -type d -name "model" | grep "$RUN_ID" | head -n 1)
+            if [ -n "$MODEL_PATH" ]; then
+              echo "✅ Found model using search: $MODEL_PATH"
+            else
+              # Method 3: Look for any artifacts/model under this run
+              MODEL_PATH=$(find mlruns -type d -path "*/$RUN_ID/artifacts/model" | head -n 1)
+              if [ -n "$MODEL_PATH" ]; then
+                echo "✅ Found model using path search: $MODEL_PATH"
+              fi
+            fi
+          fi
+          
+          if [ -n "$MODEL_PATH" ] && [ -d "$MODEL_PATH" ]; then
             echo "✅ Found model at: $MODEL_PATH"
+            
+            # Show what's in the model directory
+            echo "Model directory contents:"
+            ls -la "$MODEL_PATH"
             
             # Copy the entire model directory
             cp -r "$MODEL_PATH" 3-cicd/models/
             
-            echo "Model contents:"
+            echo "Copied model contents:"
             ls -la 3-cicd/models/model/
             
             echo "✅ Model successfully copied to 3-cicd/models/model"
           else
             echo "❌ Model directory not found for run $RUN_ID"
-            echo "Available paths in mlruns:"
+            echo ""
+            echo "===== Debugging Information ====="
+            echo "All 'model' directories found:"
             find mlruns -name "model" -type d
+            echo ""
+            echo "All directories containing run ID:"
+            find mlruns -type d | grep "$RUN_ID"
+            echo ""
+            echo "All files in mlruns (first 50):"
+            find mlruns -type f | head -n 50
             exit 1
           fi
 
