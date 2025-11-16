@@ -24,7 +24,17 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+
+# ---- compat OneHotEncoder across sklearn versions ----
+try:
+    from sklearn.preprocessing import OneHotEncoder  # type: ignore
+    _ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=False)  # sklearn >=1.2
+except TypeError:
+    from sklearn.preprocessing import OneHotEncoder  # type: ignore
+    _ohe = OneHotEncoder(handle_unknown="ignore", sparse=False)  # sklearn <1.2
+# ------------------------------------------------------
+, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     confusion_matrix, recall_score, precision_score,
@@ -119,11 +129,7 @@ def build_preprocessor(X):
         ("imp", SimpleImputer(strategy="median")),
         ("sc", StandardScaler()),
     ])
-    # Build a compatible OneHotEncoder across sklearn versions
-    try:
-        _ohe = _ohe
-    except TypeError:
-        _ohe = OneHotEncoder(handle_unknown='ignore', sparse=False)
+    # Use module-level _ohe defined for sklearn compatibility
 
     cat_pipe = Pipeline([
         ("imp", SimpleImputer(strategy="most_frequent")),
