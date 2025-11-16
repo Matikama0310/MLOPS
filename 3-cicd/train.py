@@ -28,13 +28,13 @@ from sklearn.preprocessing import OneHotEncoder
 
 # ---- compat OneHotEncoder across sklearn versions ----
 try:
-    from sklearn.preprocessing import OneHotEncoder  # type: ignore
+    from sklearn.preprocessing import OneHotEncoder,StandardScaler  # type: ignore
     _ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=False)  # sklearn >=1.2
 except TypeError:
-    from sklearn.preprocessing import OneHotEncoder  # type: ignore
+    from sklearn.preprocessing import OneHotEncoder,StandardScaler  # type: ignore
     _ohe = OneHotEncoder(handle_unknown="ignore", sparse=False)  # sklearn <1.2
 # ------------------------------------------------------
-, StandardScaler
+
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import (
     confusion_matrix, recall_score, precision_score,
