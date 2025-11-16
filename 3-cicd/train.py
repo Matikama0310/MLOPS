@@ -24,14 +24,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 # ---- compat OneHotEncoder across sklearn versions ----
 try:
-    from sklearn.preprocessing import OneHotEncoder,StandardScaler  # type: ignore
+    from sklearn.preprocessing import OneHotEncoder  # type: ignore
     _ohe = OneHotEncoder(handle_unknown="ignore", sparse_output=False)  # sklearn >=1.2
 except TypeError:
-    from sklearn.preprocessing import OneHotEncoder,StandardScaler  # type: ignore
+    from sklearn.preprocessing import OneHotEncoder  # type: ignore
     _ohe = OneHotEncoder(handle_unknown="ignore", sparse=False)  # sklearn <1.2
 # ------------------------------------------------------
 
@@ -54,7 +54,6 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
 TEST_SIZE = 0.20
 RANDOM_STATE = 42
 
-
 # ==================== HELPERS ====================
 def clean_gender(gen):
     """Clean gender values."""
@@ -67,7 +66,6 @@ def clean_gender(gen):
              "femme", "girl"}:
         return "Female"
     return "Other"
-
 
 def load_best_config():
     """Load best configuration from experiment."""
@@ -102,7 +100,6 @@ def load_best_config():
 
     return config
 
-
 def create_model(model_name, hyperparameters):
     """Create model instance from config."""
     models = {
@@ -116,7 +113,6 @@ def create_model(model_name, hyperparameters):
         raise ValueError(f"Unknown model: {model_name}")
 
     return model_class(**hyperparameters, random_state=RANDOM_STATE)
-
 
 def build_preprocessor(X):
     """Build preprocessing pipeline."""
@@ -140,7 +136,6 @@ def build_preprocessor(X):
         ("num", num_pipe, num_cols),
         ("cat", cat_pipe, cat_cols),
     ], remainder="drop")
-
 
 def load_from_kaggle():
     """Download dataset from Kaggle."""
@@ -185,21 +180,22 @@ def load_from_kaggle():
         except Exception:
             shutil.rmtree(tmpdir, ignore_errors=True)
 
-
-
 from pathlib import Path
 import shutil
 import mlflow
 import urllib.parse
 from mlflow.tracking import MlflowClient
+try:
+    from mlflow.artifacts import download_artifacts as mlflow_download_artifacts
+except Exception:  # pragma: no cover - compatibility across MLflow versions
+    mlflow_download_artifacts = None
 
 def copy_model_to_local_dir(run_id):
-    """
-    Copy the 'model' artifact from a given MLflow run into ./models/model, in a version-agnostic way.
-    Works across MLflow versions by trying (in order):
-      1) mlflow.artifacts.download_artifacts with a runs:/ URI (newer MLflow)
-      2) MlflowClient().download_artifacts(run_id, "model", dst_path=...)
-      3) Direct filesystem path via run's artifact_uri
+    """Copy the 'model' artifact from a given MLflow run into ./models/model, version-agnostic.
+    Tries, in order:
+      1) mlflow.artifacts.download_artifacts with a runs:/ URI (if available)
+      2) MlflowClient().download_artifacts(run_id, "model", ...)
+      3) Direct filesystem copy via the run's artifact_uri
     """
     print("📦 Copying model to local directory...")
     models_dir = Path("models")
@@ -209,33 +205,28 @@ def copy_model_to_local_dir(run_id):
         shutil.rmtree(model_dest)
 
     # --- Option 1: modern helper using runs:/ URI ---
-    try:
-        from mlflow.artifacts import download_artifacts as _dl
+    if mlflow_download_artifacts is not None:
         try:
             # MLflow >= 2.x signature: (artifact_uri, dst_path=None)
-            local_path = _dl(artifact_uri=f"runs:/{run_id}/model", dst_path=str(models_dir))
+            local_path = mlflow_download_artifacts(artifact_uri=f"runs:/{run_id}/model", dst_path=str(models_dir))
             print(f"Destination: {local_path}")
             return Path(local_path)
         except TypeError:
             # Some versions only accept (artifact_uri) and return a temp dir
-            local_path = _dl(artifact_uri=f"runs:/{run_id}/model")
+            local_path = mlflow_download_artifacts(artifact_uri=f"runs:/{run_id}/model")
             src = Path(local_path)
-            # Move into models/model if needed
             if src.exists() and src.is_dir():
                 if src.name != "model":
                     shutil.move(str(src), str(model_dest))
                     print(f"Destination: {model_dest}")
                     return model_dest
-                else:
-                    # already named 'model'
-                    if src.parent != models_dir:
-                        shutil.move(str(src), str(model_dest))
-                        return model_dest
-                    print(f"Destination: {src}")
-                    return src
-            # if for some reason not found, fall through
-    except Exception as e:
-        print(f"download_artifacts (runs URI) not available, trying client API. Reason: {e}")
+                if src.parent != models_dir:
+                    shutil.move(str(src), str(model_dest))
+                    return model_dest
+                print(f"Destination: {src}")
+                return src
+        except Exception as e:
+            print(f"download_artifacts not usable, trying client API. Reason: {e}")
 
     # --- Option 2: client.download_artifacts ---
     try:
@@ -247,28 +238,24 @@ def copy_model_to_local_dir(run_id):
                 shutil.move(str(src), str(model_dest))
                 print(f"Destination: {model_dest}")
                 return model_dest
-            else:
-                print(f"Destination: {src}")
-                return src
+            print(f"Destination: {src}")
+            return src
     except Exception as e:
         print(f"MlflowClient().download_artifacts failed, trying direct path. Reason: {e}")
 
     # --- Option 3: direct filesystem path from artifact_uri ---
-    try:
-        artifact_uri = mlflow.get_run(run_id).info.artifact_uri  # e.g., file:///.../mlruns/<exp>/<run>/artifacts
-        parsed = urllib.parse.urlparse(artifact_uri)
-        base_path = Path(parsed.path)
-        model_source = base_path / "model"
-        print(f"Source: {model_source}")
-        if not model_source.exists():
-            raise FileNotFoundError(f"Model not found at {model_source}")
+    artifact_uri = mlflow.get_run(run_id).info.artifact_uri  # e.g., file:///.../mlruns/<exp>/<run>/artifacts
+    parsed = urllib.parse.urlparse(artifact_uri)
+    base_path = Path(parsed.path)
+    model_source = base_path / "model"
+    print(f"Source: {model_source}")
+    if not model_source.exists():
+        raise FileNotFoundError(f"Model not found at {model_source}")
 
-        shutil.copytree(model_source, model_dest)
-        print(f"Destination: {model_dest}")
-        print("✅ Model copied successfully")
-        return model_dest
-    except Exception as e:
-        raise RuntimeError(f"Failed to copy model artifacts for run {run_id}: {e}")
+    shutil.copytree(model_source, model_dest)
+    print(f"Destination: {model_dest}")
+    print("✅ Model copied successfully")
+    return model_dest
 
 def train_production_model(config):
     """Train final production model with MLflow tracking."""
@@ -394,7 +381,6 @@ def train_production_model(config):
 
         return run_id, metrics
 
-
 def main():
     """Main training pipeline."""
     print("\n" + "=" * 60)
@@ -423,7 +409,6 @@ def main():
     print("\n🚀 Ready for deployment with app.py")
 
     return run_id
-
 
 if __name__ == "__main__":
     main()
