@@ -49,62 +49,122 @@ jobs:
           echo "✅ best_config.json found"
           cat best_config.json
 
+      - name: Create mlruns directory and set paths
+        run: |
+          # Create mlruns in the root directory
+          mkdir -p mlruns
+          
+          # Get absolute path
+          MLRUNS_PATH=$(pwd)/mlruns
+          echo "mlruns_path=$MLRUNS_PATH" >> $GITHUB_ENV
+          
+          echo "✅ mlruns directory created at: $MLRUNS_PATH"
+
       - name: Train model
         working-directory: 3-cicd
-        run: python train.py
+        run: |
+          # Use the mlruns path from environment
+          export MLFLOW_TRACKING_URI="file:${{ env.mlruns_path }}"
+          echo "MLFLOW_TRACKING_URI set to: $MLFLOW_TRACKING_URI"
+          
+          # Run training
+          python train.py
+          
+          # Verify mlruns was created
+          if [ -d "${{ env.mlruns_path }}" ]; then
+            echo "✅ mlruns directory exists after training"
+            ls -la "${{ env.mlruns_path }}/"
+          else
+            echo "❌ mlruns directory was not created"
+            exit 1
+          fi
 
       - name: Show MLflow tracking URI
         run: |
           echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
           python -c "import mlflow; print('mlflow.get_tracking_uri():', mlflow.get_tracking_uri())"
 
-      - name: Verify artifacts
+      - name: Verify artifacts were created
         run: |
-          echo "----- run_id.txt -----"
+          echo "===== Checking run_id.txt ====="
           if [ -f 3-cicd/run_id.txt ]; then
+            echo "✅ run_id.txt found"
             cat 3-cicd/run_id.txt
           else
             echo "❌ run_id.txt not found"
             exit 1
           fi
           
-          echo "----- training_schema.json -----"
+          echo ""
+          echo "===== Checking training_schema.json ====="
           if [ -f 3-cicd/training_schema.json ]; then
-            head -n 40 3-cicd/training_schema.json
+            echo "✅ training_schema.json found"
+            head -n 20 3-cicd/training_schema.json
           else
             echo "❌ training_schema.json not found"
             exit 1
           fi
           
-          echo "----- mlruns directory -----"
+          echo ""
+          echo "===== Checking mlruns directory ====="
           if [ -d mlruns ]; then
-            find mlruns -maxdepth 3 -type f | head -n 20
+            echo "✅ mlruns directory found"
+            echo "Contents:"
+            find mlruns -type f | head -n 20
           else
             echo "❌ mlruns directory not found"
+            ls -la
             exit 1
           fi
 
-      - name: Package model artifacts
-        working-directory: 3-cicd
+      - name: Get run ID and find model
+        id: get-run-id
         run: |
-          RUN_ID=$(cat run_id.txt)
+          RUN_ID=$(cat 3-cicd/run_id.txt)
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Training run ID: $RUN_ID"
+
+      - name: Package model artifacts
+        run: |
+          RUN_ID=$(cat 3-cicd/run_id.txt)
           echo "Packaging model from run: $RUN_ID"
           
-          # Create models directory
-          mkdir -p models
+          # Create models directory in 3-cicd
+          mkdir -p 3-cicd/models
           
-          # Copy model from mlruns to models directory
-          if [ -d "../mlruns" ]; then
-            # Find the model directory
-            MODEL_PATH=$(find ../mlruns -name "model" -type d | grep "$RUN_ID" | head -n 1)
-            if [ -n "$MODEL_PATH" ]; then
-              echo "Found model at: $MODEL_PATH"
-              cp -r "$MODEL_PATH" models/
-              echo "✅ Model copied to models/model"
-            else
-              echo "❌ Model directory not found for run $RUN_ID"
-              exit 1
-            fi
+          # Find the model directory
+          MODEL_PATH=$(find mlruns -path "*/artifacts/model" -type d | grep "$RUN_ID" | head -n 1)
+          
+          if [ -n "$MODEL_PATH" ]; then
+            echo "✅ Found model at: $MODEL_PATH"
+            
+            # Copy the entire model directory
+            cp -r "$MODEL_PATH" 3-cicd/models/
+            
+            echo "Model contents:"
+            ls -la 3-cicd/models/model/
+            
+            echo "✅ Model successfully copied to 3-cicd/models/model"
+          else
+            echo "❌ Model directory not found for run $RUN_ID"
+            echo "Available paths in mlruns:"
+            find mlruns -name "model" -type d
+            exit 1
+          fi
+
+      - name: Verify final structure
+        run: |
+          echo "===== Final artifact structure ====="
+          echo ""
+          echo "3-cicd directory:"
+          ls -la 3-cicd/
+          echo ""
+          echo "3-cicd/models directory:"
+          ls -la 3-cicd/models/
+          echo ""
+          if [ -d 3-cicd/models/model ]; then
+            echo "3-cicd/models/model contents:"
+            ls -la 3-cicd/models/model/
           fi
 
       - name: Upload trained artifacts
