@@ -107,14 +107,14 @@ jobs:
 
       - name: Verify artifact contents
         run: |
-          ls -R 06-cicd/models
-          cat 06-cicd/run_id.txt
+          ls -R 3-cicd/models
+          cat 3-cicd/run_id.txt
 
       - name: Upload trained model
         uses: actions/upload-artifact@v4
         with:
           name: trained-model
           path: |
-            06-cicd/run_id.txt
-            06-cicd/models/
+            3-cicd/run_id.txt
+            3-cicd/models/
           retention-days: 7
