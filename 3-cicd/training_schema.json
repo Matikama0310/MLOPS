@@ -1,7 +1,5 @@
 {
-  "numeric_features": [
-    "Age"
-  ],
+  "numeric_features": [],
   "categorical_features": [
     "Gender",
     "self_employed",
@@ -9,12 +7,10 @@
     "work_interfere",
     "no_employees",
     "remote_work",
-    "tech_company",
     "benefits",
     "care_options",
     "wellness_program",
     "seek_help",
-    "anonymity",
     "leave",
     "mental_health_consequence",
     "phys_health_consequence",
@@ -25,6 +21,30 @@
     "mental_vs_physical",
     "obs_consequence"
   ],
-  "retained_features": "ALL_COLUMNS",
-  "target": "treatment"
+  "retained_features": [
+    "Gender",
+    "self_employed",
+    "family_history",
+    "work_interfere",
+    "no_employees",
+    "remote_work",
+    "benefits",
+    "care_options",
+    "wellness_program",
+    "seek_help",
+    "leave",
+    "mental_health_consequence",
+    "phys_health_consequence",
+    "coworkers",
+    "supervisor",
+    "mental_health_interview",
+    "phys_health_interview",
+    "mental_vs_physical",
+    "obs_consequence"
+  ],
+  "target": "treatment",
+  "kaggle": {
+    "slug": "osmi/mental-health-in-tech-survey",
+    "chosen_file": "survey.csv"
+  }
 }
