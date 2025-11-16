@@ -119,11 +119,15 @@ def build_preprocessor(X):
         ("imp", SimpleImputer(strategy="median")),
         ("sc", StandardScaler()),
     ])
+    # Build a compatible OneHotEncoder across sklearn versions
+    try:
+        _ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
+    except TypeError:
+        _ohe = OneHotEncoder(handle_unknown='ignore', sparse=False)
+
     cat_pipe = Pipeline([
         ("imp", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(
-            handle_unknown='ignore', sparse_output=False
-        )),
+        ("ohe", _ohe),
     ])
 
     return ColumnTransformer([
@@ -178,60 +182,37 @@ def load_from_kaggle():
 
 def copy_model_to_local_dir(run_id):
     """
-    Copy the trained model from MLflow to local models/ directory.
-    This allows the workflow to upload it as an artifact.
+    Copy the trained model from MLflow to local models/ directory using MLflow's APIs
+    (no assumptions about experiment IDs or folder layout).
     """
-    # Determine MLflow tracking URI path
-    tracking_uri = MLFLOW_TRACKING_URI
-    if tracking_uri.startswith("file:"):
-        mlruns_path = tracking_uri[5:]  # Remove 'file:' prefix
-    else:
-        mlruns_path = tracking_uri
-    
-    # Handle relative vs absolute paths
-    if mlruns_path.startswith("./"):
-        # Relative path from 3-cicd directory
-        mlruns_path = Path("..") / mlruns_path[2:]
-    else:
-        mlruns_path = Path(mlruns_path)
-    
-    # Path to the model in MLflow
-    model_source = mlruns_path / "0" / run_id / "artifacts" / "model"
-    
-    print(f"\n📦 Copying model to local directory...")
-    print(f"Source: {model_source}")
-    
-    if not model_source.exists():
-        raise FileNotFoundError(
-            f"Model not found at {model_source}\n"
-            f"MLflow may have stored it in a different location."
-        )
-    
-    # Create models/model directory
+    from mlflow.artifacts import download_artifacts
+    from pathlib import Path
+    import shutil
+
+    print("\n📦 Copying model to local directory...")
+
+    # Ensure destination exists and is clean
     models_dir = Path("models")
     models_dir.mkdir(exist_ok=True)
-    
-    # Remove old model if exists
     model_dest = models_dir / "model"
     if model_dest.exists():
         shutil.rmtree(model_dest)
-    
-    # Copy the entire model directory
-    shutil.copytree(model_source, model_dest)
-    
-    print(f"Destination: {model_dest}")
-    print(f"✅ Model copied successfully")
-    
-    # Verify the copy
-    if not model_dest.exists():
+
+    # Download the 'model' artifact for this run into models/
+    # This will create models/model/
+    local_path = download_artifacts(run_id=run_id, path="model", dst_path=str(models_dir))
+    print(f"Destination: {local_path}")
+
+    # Sanity check
+    if not Path(local_path).exists():
         raise RuntimeError("Model copy failed - destination not found")
-    
+
     # List contents
     print(f"\nModel directory contents:")
-    for item in model_dest.iterdir():
+    for item in Path(local_path).iterdir():
         print(f"  - {item.name}")
-    
-    return model_dest
+
+    return Path(local_path)
 
 
 def train_production_model(config):
