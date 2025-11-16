@@ -20,7 +20,6 @@ import tempfile
 import subprocess
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -65,19 +64,19 @@ def load_best_config():
     if not os.path.exists(BEST_CONFIG_FILE):
         raise FileNotFoundError(
             f"\n❌ {BEST_CONFIG_FILE} not found!\n"
-            f"\n📝 Steps to fix:\n"
-            f"   1. Open and run: 0 try/experiment.ipynb\n"
-            f"   2. Execute all cells to generate best_config.json\n"
-            f"   3. The file will be created in: 3-cicd/best_config.json\n"
-            f"   4. Then run this script again: python train.py\n"
+            "\n📝 Steps to fix:\n"
+            "   1. Open and run: 0 try/experiment.ipynb\n"
+            "   2. Execute all cells to generate best_config.json\n"
+            "   3. The file will be created in: 3-cicd/best_config.json\n"
+            "   4. Then run this script again: python train.py\n"
         )
 
     with open(BEST_CONFIG_FILE, 'r') as f:
         config = json.load(f)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("LOADED CONFIGURATION FROM EXPERIMENT")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Source: {BEST_CONFIG_FILE}")
     print(f"Model: {config['model']['name']}")
     print(f"Features: {len(config['features']['selected'])}")
@@ -89,7 +88,7 @@ def load_best_config():
         f"Expected Precision: "
         f"{config['performance']['cv_precision_mean']:.1%}"
     )
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     return config
 
@@ -187,7 +186,7 @@ def train_production_model(config):
     # Load data
     print("\nLoading data from Kaggle...")
     df = load_from_kaggle()
-    print(f"✓ Data loaded: {df.shape}")
+    print(f"✅ Data loaded: {df.shape}")
 
     # Preprocess
     target_col = "treatment"
@@ -204,7 +203,7 @@ def train_production_model(config):
     available = [c for c in selected_features if c in X.columns]
     X = X[available].copy()
 
-    print(f"✓ Using {len(available)} selected features")
+    print(f"✅ Using {len(available)} selected features")
 
     # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(
@@ -242,7 +241,7 @@ def train_production_model(config):
 
         print("\nTraining model...")
         pipe.fit(X_train, y_train)
-        print("✓ Training complete")
+        print("✅ Training complete")
 
         # Evaluate
         y_pred = pipe.predict(X_test)
@@ -262,14 +261,14 @@ def train_production_model(config):
 
         mlflow.log_metrics(metrics)
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("TEST RESULTS")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"Recall:    {metrics['test_recall']:.3f}")
         print(f"Precision: {metrics['test_precision']:.3f}")
         print(f"F1 Score:  {metrics['test_f1']:.3f}")
         print(f"ROC-AUC:   {metrics['test_roc_auc']:.3f}")
-        print(f"\nConfusion Matrix:")
+        print("\nConfusion Matrix:")
         print(f"  TN: {metrics['test_tn']:3d}  FP: {metrics['test_fp']:3d}")
         print(f"  FN: {metrics['test_fn']:3d}  TP: {metrics['test_tp']:3d}")
 
@@ -294,16 +293,16 @@ def train_production_model(config):
             registered_model_name='mental_health_classifier'
         )
 
-        print(f"\n✓ Model logged to MLflow")
+        print("\n✅ Model logged to MLflow")
 
         return run_id, metrics
 
 
 def main():
     """Main training pipeline."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("PRODUCTION MODEL TRAINING")
-    print("="*60)
+    print("=" * 60)
 
     # Load experiment results
     config = load_best_config()
@@ -315,15 +314,15 @@ def main():
     with open('run_id.txt', 'w') as f:
         f.write(run_id)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("COMPLETE")
-    print(f"{'='*60}")
-    print(f"\n✓ Run ID: {run_id}")
-    print(f"✓ Run ID saved to: run_id.txt")
-    print(f"✓ Schema saved to: training_schema.json")
-    print(f"\n📊 View in MLflow UI:")
+    print(f"{'=' * 60}")
+    print(f"\n✅ Run ID: {run_id}")
+    print("✅ Run ID saved to: run_id.txt")
+    print("✅ Schema saved to: training_schema.json")
+    print("\n📊 View in MLflow UI:")
     print(f"   mlflow ui --backend-store-uri {MLFLOW_TRACKING_URI}")
-    print(f"\n🚀 Ready for deployment with app.py")
+    print("\n🚀 Ready for deployment with app.py")
 
     return run_id
 
