@@ -121,7 +121,7 @@ def build_preprocessor(X):
     ])
     # Build a compatible OneHotEncoder across sklearn versions
     try:
-        _ohe = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
+        _ohe = _ohe
     except TypeError:
         _ohe = OneHotEncoder(handle_unknown='ignore', sparse=False)
 
@@ -180,40 +180,89 @@ def load_from_kaggle():
             shutil.rmtree(tmpdir, ignore_errors=True)
 
 
+
+from pathlib import Path
+import shutil
+import mlflow
+import urllib.parse
+from mlflow.tracking import MlflowClient
+
 def copy_model_to_local_dir(run_id):
     """
-    Copy the trained model from MLflow to local models/ directory using MLflow's APIs
-    (no assumptions about experiment IDs or folder layout).
+    Copy the 'model' artifact from a given MLflow run into ./models/model, in a version-agnostic way.
+    Works across MLflow versions by trying (in order):
+      1) mlflow.artifacts.download_artifacts with a runs:/ URI (newer MLflow)
+      2) MlflowClient().download_artifacts(run_id, "model", dst_path=...)
+      3) Direct filesystem path via run's artifact_uri
     """
-    from mlflow.artifacts import download_artifacts
-    from pathlib import Path
-    import shutil
-
-    print("\n📦 Copying model to local directory...")
-
-    # Ensure destination exists and is clean
+    print("📦 Copying model to local directory...")
     models_dir = Path("models")
     models_dir.mkdir(exist_ok=True)
     model_dest = models_dir / "model"
     if model_dest.exists():
         shutil.rmtree(model_dest)
 
-    # Download the 'model' artifact for this run into models/
-    # This will create models/model/
-    local_path = download_artifacts(run_id=run_id, path="model", dst_path=str(models_dir))
-    print(f"Destination: {local_path}")
+    # --- Option 1: modern helper using runs:/ URI ---
+    try:
+        from mlflow.artifacts import download_artifacts as _dl
+        try:
+            # MLflow >= 2.x signature: (artifact_uri, dst_path=None)
+            local_path = _dl(artifact_uri=f"runs:/{run_id}/model", dst_path=str(models_dir))
+            print(f"Destination: {local_path}")
+            return Path(local_path)
+        except TypeError:
+            # Some versions only accept (artifact_uri) and return a temp dir
+            local_path = _dl(artifact_uri=f"runs:/{run_id}/model")
+            src = Path(local_path)
+            # Move into models/model if needed
+            if src.exists() and src.is_dir():
+                if src.name != "model":
+                    shutil.move(str(src), str(model_dest))
+                    print(f"Destination: {model_dest}")
+                    return model_dest
+                else:
+                    # already named 'model'
+                    if src.parent != models_dir:
+                        shutil.move(str(src), str(model_dest))
+                        return model_dest
+                    print(f"Destination: {src}")
+                    return src
+            # if for some reason not found, fall through
+    except Exception as e:
+        print(f"download_artifacts (runs URI) not available, trying client API. Reason: {e}")
 
-    # Sanity check
-    if not Path(local_path).exists():
-        raise RuntimeError("Model copy failed - destination not found")
+    # --- Option 2: client.download_artifacts ---
+    try:
+        client = MlflowClient()
+        local_dir = client.download_artifacts(run_id, "model", dst_path=str(models_dir))
+        src = Path(local_dir)
+        if src.exists() and src.is_dir():
+            if src.name != "model":
+                shutil.move(str(src), str(model_dest))
+                print(f"Destination: {model_dest}")
+                return model_dest
+            else:
+                print(f"Destination: {src}")
+                return src
+    except Exception as e:
+        print(f"MlflowClient().download_artifacts failed, trying direct path. Reason: {e}")
 
-    # List contents
-    print(f"\nModel directory contents:")
-    for item in Path(local_path).iterdir():
-        print(f"  - {item.name}")
+    # --- Option 3: direct filesystem path from artifact_uri ---
+    try:
+        artifact_uri = mlflow.get_run(run_id).info.artifact_uri  # e.g., file:///.../mlruns/<exp>/<run>/artifacts
+        parsed = urllib.parse.urlparse(artifact_uri)
+        base_path = Path(parsed.path)
+        model_source = base_path / "model"
+        print(f"Source: {model_source}")
+        if not model_source.exists():
+            raise FileNotFoundError(f"Model not found at {model_source}")
 
-    return Path(local_path)
-
+        shutil.copytree(model_source, model_dest)
+        print(f"Destination: {model_dest}")
+        print("✅ Model copied successfully")
+        return model_dest
+    except Exception as e:
+        raise RuntimeError(f"Failed to copy model artifacts for run {run_id}: {e}")
 
 def train_production_model(config):
     """Train final production model with MLflow tracking."""
