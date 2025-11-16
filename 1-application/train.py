@@ -1,270 +1,319 @@
 # -*- coding: utf-8 -*-
 """
-Adapted training script from the Jupyter notebook:
-- Uses the notebook's cleaned features and preprocessing.
-- Applies the selected/retained features (if a file from the notebook exists).
-- Uses the notebook's "best model" (if recorded); otherwise defaults to XGBoost.
-- Trains on the FULL dataset (no validation split), as requested.
-- Logs to MLflow and saves the fitted pipeline.
+Mental Health Treatment Prediction - Production Training Script.
 
-Assumptions:
-- Data CSV path: ../data/raw/survey.csv (same as the notebook).
-- Optional files produced by the notebook (if you ran it):
-    - feature_selection_results.txt  (contains "Retained features" list)
-    - best_model_name.txt            (contains a single line with model name, e.g., "XGBoost")
-    - best_params.json               (JSON object of tuned hyperparameters for that model)
+Loads best configuration from experiment.ipynb and trains final model.
+Logs to MLflow and returns run_id for deployment.
 
-You can override via CLI flags:
-    python adapted_notebook_train.py --data ../data/raw/survey.csv --mlflow_uri http://localhost:5000 \\
-        --experiment mental-health-tech-prediction --model XGBoost
+Usage:
+    1. Run experiment.ipynb to generate best_config.json
+    2. Run this script: python train.py
+    3. Deploy with run_id from run_id.txt
 """
 
-import argparse
-import json
 import os
 import re
-import sys
-import warnings
+import json
+import zipfile
+import shutil
+import tempfile
+import subprocess
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
-
+from sklearn.metrics import (
+    confusion_matrix, recall_score, precision_score,
+    f1_score, roc_auc_score
+)
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
-
 import mlflow
 import mlflow.sklearn
 
-warnings.filterwarnings("ignore", category=UserWarning)
+# ==================== CONFIG ====================
+KAGGLE_DATASET = "osmi/mental-health-in-tech-survey"
+BEST_CONFIG_FILE = "best_config.json"
+MLFLOW_EXPERIMENT_NAME = "mental-health-production"
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns")
+TEST_SIZE = 0.20
+RANDOM_STATE = 42
 
-# -----------------------------
-# Helpers mirroring the notebook
-# -----------------------------
 
-def clean_gender(gen: object) -> str:
-    """Normalize gender categories exactly like the notebook."""
+# ==================== HELPERS ====================
+def clean_gender(gen):
+    """Clean gender values."""
     s = str(gen).strip().lower()
-    s = re.sub(r"[\\W_]+", " ", s).strip()
-    if s in {"m", "male", "man", "make", "mal", "malr", "msle", "masc", "mail", "boy"}:
+    s = re.sub(r"[\W_]+", " ", s).strip()
+    if s in {"m", "male", "man", "make", "mal", "malr",
+             "msle", "masc", "mail", "boy"}:
         return "Male"
     if s in {"f", "female", "woman", "femake", "femail", "femme", "girl"}:
         return "Female"
     return "Other"
 
 
-def read_retained_features(path: str) -> list:
-    """
-    Parse feature_selection_results.txt (if present) to extract retained features.
-    Expected format sections:
-        Retained features:
-        - col_a
-        - col_b
-    """
-    if not os.path.exists(path):
-        return []
-    retained = []
-    in_section = False
-    with open(path, "r", encoding="utf-8") as fh:
-        for line in fh:
-            line = line.rstrip("\\n")
-            if line.strip().lower().startswith("retained features"):
-                in_section = True
-                continue
-            if in_section:
-                if not line.strip():
-                    break
-                if line.strip().startswith("- "):
-                    retained.append(line.strip()[2:])
-                else:
-                    # stop if section changed
-                    break
-    return retained
+def load_best_config():
+    """Load best configuration from experiment."""
+    if not os.path.exists(BEST_CONFIG_FILE):
+        raise FileNotFoundError(
+            f"\n❌ {BEST_CONFIG_FILE} not found!\n"
+            f"\n📝 Steps to fix:\n"
+            f"   1. Open and run: 0 try/experiment.ipynb\n"
+            f"   2. Execute all cells to generate best_config.json\n"
+            f"   3. The file will be created in: 3-cicd/best_config.json\n"
+            f"   4. Then run this script again: python train.py\n"
+        )
+    
+    with open(BEST_CONFIG_FILE, 'r') as f:
+        config = json.load(f)
+    
+    print(f"\n{'='*60}")
+    print("LOADED CONFIGURATION FROM EXPERIMENT")
+    print(f"{'='*60}")
+    print(f"Source: {BEST_CONFIG_FILE}")
+    print(f"Model: {config['model']['name']}")
+    print(f"Features: {len(config['features']['selected'])}")
+    print(f"Expected Recall: {config['performance']['cv_recall_mean']:.1%}")
+    print(f"Expected Precision: {config['performance']['cv_precision_mean']:.1%}")
+    print(f"{'='*60}")
+    
+    return config
 
 
-def maybe_read_best_model(path: str) -> str:
-    """Read best model name from a tiny text file if it exists; else return empty string."""
-    if os.path.exists(path):
-        val = open(path, "r", encoding="utf-8").read().strip()
-        return val
-    return ""
+def create_model(model_name, hyperparameters):
+    """Create model instance from config."""
+    models = {
+        'LogisticRegression': LogisticRegression,
+        'RandomForest': RandomForestClassifier,
+        'XGBoost': XGBClassifier
+    }
+    
+    model_class = models.get(model_name)
+    if model_class is None:
+        raise ValueError(f"Unknown model: {model_name}")
+    
+    return model_class(**hyperparameters, random_state=RANDOM_STATE)
 
 
-def maybe_read_best_params(path: str) -> dict:
-    """Read best hyperparameters JSON if it exists; else return {}."""
-    if os.path.exists(path):
-        try:
-            return json.load(open(path, "r", encoding="utf-8"))
-        except Exception:
-            return {}
-    return {}
-
-
-def build_preprocessor(numeric_features: list, categorical_features: list) -> ColumnTransformer:
-    """ColumnTransformer mirroring the notebook: median+scale for numeric, most_frequent+OHE for categorical."""
-    numeric_pipeline = Pipeline([
-        ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler())
+def build_preprocessor(X):
+    """Build preprocessing pipeline."""
+    num_cols = X.select_dtypes(include=["number", "bool"]).columns.tolist()
+    cat_cols = X.select_dtypes(
+        include=["object", "category"]
+    ).columns.tolist()
+    
+    num_pipe = Pipeline([
+        ("imp", SimpleImputer(strategy="median")),
+        ("sc", StandardScaler()),
     ])
-    categorical_pipeline = Pipeline([
-        ("impute", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+    cat_pipe = Pipeline([
+        ("imp", SimpleImputer(strategy="most_frequent")),
+        ("ohe", OneHotEncoder(handle_unknown='ignore', sparse_output=False)),
     ])
-    preprocessor = ColumnTransformer([
-        ("num", numeric_pipeline, numeric_features),
-        ("cat", categorical_pipeline, categorical_features),
+    
+    return ColumnTransformer([
+        ("num", num_pipe, num_cols),
+        ("cat", cat_pipe, cat_cols),
     ], remainder="drop")
-    return preprocessor
 
 
-def build_model(model_name: str, params: dict):
-    """Construct the classifier specified by model_name with params (if any)."""
-    name = model_name.lower()
-    if name in {"xgb", "xgboost"}:
-        default = dict(
-            random_state=42, n_estimators=300, max_depth=4,
-            learning_rate=0.05, subsample=0.8, colsample_bytree=0.8,
-            n_jobs=-1, reg_lambda=1.0, objective="binary:logistic",
-            eval_metric="logloss"
+def load_from_kaggle():
+    """Download dataset from Kaggle."""
+    from shutil import which
+    
+    if not which("kaggle"):
+        raise RuntimeError("Install Kaggle CLI: pip install kaggle")
+    
+    cfg = Path.home() / ".kaggle" / "kaggle.json"
+    if not cfg.exists() and not (
+        os.getenv("KAGGLE_USERNAME") and os.getenv("KAGGLE_KEY")
+    ):
+        raise RuntimeError(
+            "Kaggle credentials not found. "
+            "Create ~/.kaggle/kaggle.json or set KAGGLE_USERNAME/KAGGLE_KEY."
         )
-        default.update(params or {})
-        return XGBClassifier(**default)
-    if name in {"rf", "randomforest", "random_forest"}:
-        default = dict(
-            n_estimators=400, max_depth=None, min_samples_split=2,
-            class_weight=None, random_state=42, n_jobs=-1
+    
+    tmp = tempfile.TemporaryDirectory()
+    tmpdir = Path(tmp.name)
+    try:
+        subprocess.check_call([
+            "kaggle", "datasets", "download", "-d", KAGGLE_DATASET,
+            "-p", str(tmpdir), "-q"
+        ])
+        for z in tmpdir.glob("*.zip"):
+            with zipfile.ZipFile(z, "r") as zf:
+                zf.extractall(tmpdir)
+            z.unlink()
+        
+        csvs = list(tmpdir.rglob("*.csv"))
+        surveyish = [p for p in csvs if "survey" in p.name.lower()]
+        if surveyish:
+            path = max(surveyish, key=lambda p: p.stat().st_size)
+        else:
+            path = max(csvs, key=lambda p: p.stat().st_size)
+        
+        return pd.read_csv(path)
+    finally:
+        try:
+            tmp.cleanup()
+        except Exception:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+def train_production_model(config):
+    """Train final production model with MLflow tracking."""
+    
+    # Setup MLflow
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+    
+    # Load data
+    print("\nLoading data from Kaggle...")
+    df = load_from_kaggle()
+    print(f"✓ Data loaded: {df.shape}")
+    
+    # Preprocess
+    target_col = "treatment"
+    features_to_drop = ['Timestamp', 'Country', 'state', 'comments', target_col]
+    
+    y = df[target_col].map({"Yes": 1, "No": 0}).astype(int)
+    X = df.drop(columns=[c for c in features_to_drop if c in df.columns])
+    X['Gender'] = X['Gender'].apply(clean_gender)
+    
+    # Use selected features from experiment
+    selected_features = config['features']['selected']
+    available = [c for c in selected_features if c in X.columns]
+    X = X[available].copy()
+    
+    print(f"✓ Using {len(available)} selected features")
+    
+    # Train/test split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
+    )
+    
+    # Start MLflow run
+    with mlflow.start_run() as run:
+        run_id = run.info.run_id
+        print(f"\nMLflow Run ID: {run_id}")
+        
+        # Log config
+        mlflow.log_params({
+            'model_name': config['model']['name'],
+            'n_features': len(available),
+            'test_size': TEST_SIZE,
+            'random_state': RANDOM_STATE,
+        })
+        mlflow.log_params({
+            f"hp_{k}": v 
+            for k, v in config['model']['hyperparameters'].items()
+        })
+        
+        # Create and train model
+        model = create_model(
+            config['model']['name'],
+            config['model']['hyperparameters']
         )
-        default.update(params or {})
-        return RandomForestClassifier(**default)
-    if name in {"logreg", "logistic", "logisticregression"}:
-        default = dict(max_iter=2000, solver="lbfgs", random_state=42)
-        default.update(params or {})
-        return LogisticRegression(**default)
-    raise ValueError(f"Unknown model name: {model_name}")
+        
+        preprocessor = build_preprocessor(X_train)
+        pipe = Pipeline([
+            ('preprocess', preprocessor),
+            ('model', model)
+        ])
+        
+        print("\nTraining model...")
+        pipe.fit(X_train, y_train)
+        print("✓ Training complete")
+        
+        # Evaluate
+        y_pred = pipe.predict(X_test)
+        y_proba = pipe.predict_proba(X_test)[:, 1]
+        
+        cm = confusion_matrix(y_test, y_pred)
+        metrics = {
+            'test_recall': float(recall_score(y_test, y_pred)),
+            'test_precision': float(precision_score(y_test, y_pred)),
+            'test_f1': float(f1_score(y_test, y_pred)),
+            'test_roc_auc': float(roc_auc_score(y_test, y_proba)),
+            'test_tn': int(cm[0, 0]),
+            'test_fp': int(cm[0, 1]),
+            'test_fn': int(cm[1, 0]),
+            'test_tp': int(cm[1, 1]),
+        }
+        
+        mlflow.log_metrics(metrics)
+        
+        print(f"\n{'='*60}")
+        print("TEST RESULTS")
+        print(f"{'='*60}")
+        print(f"Recall:    {metrics['test_recall']:.3f}")
+        print(f"Precision: {metrics['test_precision']:.3f}")
+        print(f"F1 Score:  {metrics['test_f1']:.3f}")
+        print(f"ROC-AUC:   {metrics['test_roc_auc']:.3f}")
+        print(f"\nConfusion Matrix:")
+        print(f"  TN: {metrics['test_tn']:3d}  FP: {metrics['test_fp']:3d}")
+        print(f"  FN: {metrics['test_fn']:3d}  TP: {metrics['test_tp']:3d}")
+        
+        # Save schema
+        schema = {
+            'numeric_features': [],
+            'categorical_features': available,
+            'retained_features': available,
+            'target': 'treatment',
+        }
+        
+        with open('training_schema.json', 'w') as f:
+            json.dump(schema, f, indent=2)
+        
+        mlflow.log_artifact('training_schema.json')
+        mlflow.log_artifact(BEST_CONFIG_FILE)
+        
+        # Log model
+        mlflow.sklearn.log_model(
+            pipe,
+            artifact_path='model',
+            registered_model_name='mental_health_classifier'
+        )
+        
+        print(f"\n✓ Model logged to MLflow")
+        
+        return run_id, metrics
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="../data/raw/survey.csv", help="Path to survey.csv (same as notebook)")
-    parser.add_argument("--mlflow_uri", default="http://localhost:5000", help="MLflow Tracking URI")
-    parser.add_argument("--experiment", default="mental-health-tech-prediction", help="MLflow experiment name")
-    parser.add_argument("--model", default="", help="Force model name (e.g., XGBoost, RandomForest, LogisticRegression)")
-    parser.add_argument("--best_model_file", default="best_model_name.txt", help="Optional file with best model name")
-    parser.add_argument("--best_params_file", default="best_params.json", help="Optional JSON file with best hyperparams")
-    parser.add_argument("--features_file", default="feature_selection_results.txt", help="Optional retained-features file")
-    parser.add_argument("--output_runid", default="run_id.txt", help="Where to save MLflow run_id")
-    args = parser.parse_args()
-
-    # -----------------------------
-    # Load data
-    # -----------------------------
-    if not os.path.exists(args.data):
-        print(f"[ERROR] Data file not found: {args.data}", file=sys.stderr)
-        sys.exit(2)
-
-    df = pd.read_csv(args.data)
-    print(f"Loaded data: {df.shape} from {args.data}")
-
-    # -----------------------------
-    # Target & feature prep (as in notebook)
-    # -----------------------------
-    target_col = "treatment"
-    if target_col not in df.columns:
-        print(f"[ERROR] Expected target column '{target_col}' not found in data.", file=sys.stderr)
-        sys.exit(3)
-
-    # Binary mapping Yes/No -> 1/0
-    y = df[target_col].map({"Yes": 1, "No": 0}).astype(int)
-    features_to_drop = ["Timestamp", "Country", "state", "comments", target_col]
-    existing_to_drop = [c for c in features_to_drop if c in df.columns]
-    X = df.drop(columns=existing_to_drop)
-
-    # Gender cleaning
-    if "Gender" in X.columns:
-        X["Gender"] = X["Gender"].apply(clean_gender)
-
-    # Use retained features if provided
-    retained = read_retained_features(args.features_file)
-    if retained:
-        # Keep intersection to avoid KeyError
-        retained = [c for c in retained if c in X.columns]
-        if not retained:
-            print("[WARN] Retained-features list was empty after intersecting with columns; falling back to all features.")
-        else:
-            X = X[retained]
-            print(f"Using {len(retained)} retained features from {args.features_file}")
-
-    # Separate features by dtype (same approach as the notebook)
-    numeric_features = X.select_dtypes(include=["number", "bool"]).columns.tolist()
-    categorical_features = X.select_dtypes(include=["object", "category"]).columns.tolist()
-
-    print(f"Numeric features: {len(numeric_features)} | Categorical features: {len(categorical_features)}")
-
-    # -----------------------------
-    # Preprocessor & model
-    # -----------------------------
-    preprocessor = build_preprocessor(numeric_features, categorical_features)
-
-    # Resolve best model
-    chosen_model_name = args.model or maybe_read_best_model(args.best_model_file) or "XGBoost"
-    best_params = maybe_read_best_params(args.best_params_file)
-    model = build_model(chosen_model_name, best_params)
-
-    # Full pipeline
-    pipeline = Pipeline([
-        ("preprocess", preprocessor),
-        ("model", model)
-    ])
-
-    # -----------------------------
-    # MLflow logging & training (NO validation split; fit on all data)
-    # -----------------------------
-    mlflow.set_tracking_uri(args.mlflow_uri)
-    mlflow.set_experiment(args.experiment)
-
-    with mlflow.start_run() as run:
-        run_id = run.info.run_id
-        print(f"MLflow run_id: {run_id}")
-
-        # Log basic params
-        mlflow.log_params({
-            "model_name": chosen_model_name,
-            "n_numeric_features": len(numeric_features),
-            "n_categorical_features": len(categorical_features),
-            "n_rows": X.shape[0],
-            "n_cols": X.shape[1],
-        })
-        if best_params:
-            mlflow.log_params({f"best__{k}": v for k, v in best_params.items()})
-
-        # Fit on FULL data
-        pipeline.fit(X, y)
-
-        # Log artifact: retained features (if any) and schema
-        schema = {
-            "numeric_features": numeric_features,
-            "categorical_features": categorical_features,
-            "retained_features": retained or "ALL_COLUMNS",
-            "target": target_col
-        }
-        with open("training_schema.json", "w", encoding="utf-8") as fh:
-            json.dump(schema, fh, indent=2)
-        mlflow.log_artifact("training_schema.json")
-
-        # Log the full sklearn pipeline
-        mlflow.sklearn.log_model(pipeline, artifact_path="model")
-
-        # Persist run_id for downstream use
-        with open(args.output_runid, "w", encoding="utf-8") as fh:
-            fh.write(run_id)
-
-        print("Training complete. Model and artifacts logged to MLflow.")
-        print("Run ID saved to", args.output_runid)
+    """Main training pipeline."""
+    print("\n" + "="*60)
+    print("PRODUCTION MODEL TRAINING")
+    print("="*60)
+    
+    # Load experiment results
+    config = load_best_config()
+    
+    # Train production model
+    run_id, metrics = train_production_model(config)
+    
+    # Save run_id for deployment
+    with open('run_id.txt', 'w') as f:
+        f.write(run_id)
+    
+    print(f"\n{'='*60}")
+    print("COMPLETE")
+    print(f"{'='*60}")
+    print(f"\n✓ Run ID: {run_id}")
+    print(f"✓ Run ID saved to: run_id.txt")
+    print(f"✓ Schema saved to: training_schema.json")
+    print(f"\n📊 View in MLflow UI:")
+    print(f"   mlflow ui --backend-store-uri {MLFLOW_TRACKING_URI}")
+    print(f"\n🚀 Ready for deployment with app.py")
+    
+    return run_id
 
 
 if __name__ == "__main__":
