@@ -22,6 +22,7 @@ from fastapi import FastAPI, Body, HTTPException
 from pydantic import BaseModel, Field
 import mlflow
 import mlflow.pyfunc
+import mlflow.sklearn
 from mlflow.artifacts import download_artifacts
 
 
@@ -213,30 +214,44 @@ class PredictResponse(BaseModel):
 # -----------------------------
 # Model loading strategies
 # -----------------------------
-def _try_load_local_model() -> Optional[mlflow.pyfunc.PyFuncModel]:
+def _try_load_local_model():
     path = Path(MODEL_URI)
     if not path.exists():
         return None
     try:
-        m = mlflow.pyfunc.load_model(MODEL_URI)
-        print(f"[startup] Loaded LOCAL model from {MODEL_URI}")
+        m = mlflow.sklearn.load_model(MODEL_URI)
+        print(f"[startup] Loaded LOCAL sklearn model from {MODEL_URI}")
         return m
     except Exception as e:
-        print(f"[startup] Local model load failed from {MODEL_URI}: {e}")
+        print(f"[startup] Local sklearn model load failed from {MODEL_URI}: {e}")
+    try:
+        m = mlflow.pyfunc.load_model(MODEL_URI)
+        print(f"[startup] Loaded LOCAL pyfunc model from {MODEL_URI}")
+        return m
+    except Exception as e:
+        print(f"[startup] Local pyfunc model load failed from {MODEL_URI}: {e}")
         return None
 
 
-def _try_load_mlflow_model(run_id: str) -> Optional[mlflow.pyfunc.PyFuncModel]:
+def _try_load_mlflow_model(run_id: str):
     if not run_id:
         return None
     try:
         if MLFLOW_TRACKING_URI:
             mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-        m = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
-        print(f"[startup] Loaded MLflow model from run {run_id}")
+        m = mlflow.sklearn.load_model(f"runs:/{run_id}/model")
+        print(f"[startup] Loaded MLflow sklearn model from run {run_id}")
         return m
     except Exception as e:
-        print(f"[startup] MLflow model load failed for run {run_id}: {e}")
+        print(f"[startup] MLflow sklearn model load failed for run {run_id}: {e}")
+    try:
+        if MLFLOW_TRACKING_URI:
+            mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        m = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
+        print(f"[startup] Loaded MLflow pyfunc model from run {run_id}")
+        return m
+    except Exception as e:
+        print(f"[startup] MLflow pyfunc model load failed for run {run_id}: {e}")
         return None
 
 
