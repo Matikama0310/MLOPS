@@ -5,7 +5,6 @@ Streamlit Frontend for Mental Health Treatment Predictor
 A beautiful, interactive UI for making predictions using the ML model.
 """
 
-import os
 import json
 from typing import Dict, Any
 
