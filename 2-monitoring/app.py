@@ -89,7 +89,7 @@ class _DummyModel:
 # -----------------------------
 # Config (env overridable)
 # -----------------------------
-PORT = int(os.getenv("PORT", "8000"))
+PORT = int(os.getenv("PORT", "9696"))
 
 MODEL_URI = os.getenv("MODEL_URI", "./model")
 SCHEMA_PATH = os.getenv("SCHEMA_PATH", "./training_schema.json")

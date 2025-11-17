@@ -12,7 +12,7 @@ import requests
 import pandas as pd
 
 
-DEFAULT_API = "http://localhost:8000"
+DEFAULT_API = "http://localhost:9696"
 DEFAULT_LOG = Path("data/health_predictions.csv")
 DEFAULT_DATA = Path("../data/raw/survey.csv")
 CONFIG_FILE = Path("best_config.json")
