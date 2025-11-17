@@ -27,7 +27,7 @@ Day-to-day work happens in `3-cicd/`, which contains:
 - Optional: MLflow tracking server. By default the scripts use `file:./mlruns`.
 
 ## Local Setup
-
+In a terminal input the following, line by line
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # or source .venv/bin/activate on macOS/Linux
@@ -39,37 +39,44 @@ The root `requirements.txt` simply aggregates each sub-project’s pinned depend
 ## Training Pipeline (optional before deployment)
 
 1. Generate `3-cicd/best_config.json` by running the notebook in `0-try/experiment.ipynb` or by supplying your own hyperparameters.
-2. (Optional but recommended) store your Kaggle credentials as GitHub secrets so CI/CD workflows can download the dataset:
+2. Store your Kaggle credentials as GitHub secrets so CI/CD workflows can download the dataset:
    - In your GitHub repository, navigate to **Settings → Secrets and variables → Actions → New repository secret**.
    - Create secrets named `KAGGLE_USERNAME` and `KAGGLE_KEY` using the values from your local `~/.kaggle/kaggle.json`.
    - Reference them in your workflow file as `${{ secrets.KAGGLE_USERNAME }}` and `${{ secrets.KAGGLE_KEY }}` when running `python train.py`.
-3. Start running the MLFlow server
+3. Start running the MLFlow server, by writing in the activated terminal the following
 ```powershell
-mlflow server --host 127.0.0.1 --port 5000
+mlflow server --host 127.0.0.1 --port 5010
 ```
-Open http://localhost:5000 (leave running).
-4. From `3-cicd/`, run:
+Open http://localhost:5010 or http://127.0.0.1:5010 on mac (leave running).
+4. Open a new terminal, activate the enviroment and go to the 3 folder
+   From `3-cicd/`, run: 
    ```bash
+   cd 3-cicd
    python train.py
    ```
    - Downloads Kaggle data, cleans it, trains the configured model, logs metrics/artifacts to MLflow.
    - Writes `run_id.txt`, `training_schema.json`, and copies the exported model to `3-cicd/models/model` (an MLflow pyfunc directory).
 5. Keep `models/model` under version control (or publish it to object storage) so the inference service can load it without MLflow connectivity.
+6. In the terminal run:
+   ```mlflow ui --backend-store-uri file:./mlruns --host 127.0.0.1 --port 5010```
+   You can now see the models in the localhost link
 
 ## Running Locally
 
 ### FastAPI service
-
+In a new terminal run:
 ```bash
-py app.py
+cd 3-cicd
+py app.py #python app.py in mac
 ```
 
 - Uses the local `models/model` artifact by default. Override with `MODEL_URI` or `RUN_ID` if you want to pull directly from MLflow.
-- Health check: `GET http://localhost:8000/health`
-- Prediction: `POST http://localhost:8000/predict`
+- Health check: `GET http://localhost:8000/health` --> need to see status "ok"
+- Prediction: `POST http://127.0.0.1:8000/docs`
 
 ### Streamlit UI
 
+Open a new terminal
 ```bash
 cd 3-cicd
 streamlit run streamlit_app.py
@@ -80,12 +87,19 @@ The UI expects the API at `API_URL = "http://localhost:8000"` when running local
 ## Deploying the FastAPI Backend to Render
 
 1. Push this repository to GitHub (or another git provider Render supports).
+   In a new terminal: 
+      git init
+      git remote add origin https://github.com/username/MLOPS-main.git
+      git add .
+      git commit -m "Initial full repo upload"
+      git branch -M main
+      git push -u origin main
 2. In Render, create a **New Web Service** and connect it to the repo.
 3. Configure the service:
    - **Root directory**: `3-cicd`
    - **Environment**: Python 3.10+
    - **Build command**: `pip install -r requirements.txt`
-   - **Start command**: `uvicorn app:app --host 0.0.0.0 --port 10000`
+   - **Start command**: `uvicorn app:app --host 0.0.0.0 --port 10000` # in mac uvicorn 3-cicd.app:app --host 0.0.0.0 --port $PORT
 4. Environment variables (adjust as needed):
    - `PORT=10000` (Render injects this automatically; match the start command)
    - `MODEL_URI=./model` (if you committed `models/model` inside `3-cicd` and added it to the Docker/Render context)
@@ -143,5 +157,5 @@ Update the code to read `API_URL = os.getenv("API_URL", "http://localhost:8000")
 - **100 % / 0 % probabilities:** Make sure the saved pipeline’s final estimator implements `predict_proba`. The provided LogisticRegression/RandomForest/XGBoost configs do.
 - **Streamlit errors about CORS or HTTPS:** Render serves HTTPS by default; Streamlit Cloud also uses HTTPS. No extra configuration is needed, but ensure `API_URL` starts with `https://` when pointing to Render.
 
-Happy predicting!
+### Happy predicting!
 
