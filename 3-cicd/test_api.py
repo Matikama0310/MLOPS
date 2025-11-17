@@ -8,7 +8,7 @@ import sys
 import json
 import requests
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:9696"
 
 
 def load_selected_features():

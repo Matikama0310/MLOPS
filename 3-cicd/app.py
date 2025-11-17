@@ -324,12 +324,12 @@ def examples():
     single_json = json.dumps(SAMPLE_SINGLE)
     batch_json = json.dumps(SAMPLE_BATCH)
     curl_single = (
-        "curl -X POST http://localhost:8000/predict "
+        "curl -X POST http://localhost:9696/predict "
         "-H 'Content-Type: application/json' "
         f"-d '{single_json}'"
     )
     curl_batch = (
-        "curl -X POST http://localhost:8000/predict_batch "
+        "curl -X POST http://localhost:9696/predict_batch "
         "-H 'Content-Type: application/json' "
         f"-d '{batch_json}'"
     )

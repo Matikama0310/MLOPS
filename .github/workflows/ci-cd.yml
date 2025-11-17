@@ -102,7 +102,7 @@ jobs:
         working-directory: 3-cicd
         run: |
           # Update BASE_URL in test to use port 9696
-          sed -i 's|http://localhost:8000|http://localhost:9696|g' test_api.py
+          sed -i 's|http://localhost:9696|http://localhost:9696|g' test_api.py
           
           # Run tests
           python test_api.py || (docker logs mental-app && exit 1)
