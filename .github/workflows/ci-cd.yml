@@ -33,6 +33,9 @@ jobs:
       - name: Install testing tools
         run: pip install flake8 pytest requests
 
+      - name: Install project dependencies
+        run: pip install -r 3-cicd/requirements.txt
+
       - name: Download latest trained-model artifact
         uses: actions/download-artifact@v4
         with:
@@ -48,6 +51,32 @@ jobs:
           test -f 3-cicd/run_id.txt && echo "✅ run_id.txt found" || echo "❌ run_id.txt missing"
           test -f 3-cicd/training_schema.json && echo "✅ training_schema.json found" || echo "❌ training_schema.json missing"
           test -d 3-cicd/models && echo "✅ models/ directory found" || echo "❌ models/ directory missing"
+
+      - name: Launch Streamlit frontend
+        run: |
+          cd 3-cicd
+          nohup streamlit run streamlit_app.py \
+            --server.headless true \
+            --server.port 8501 \
+            --server.address 0.0.0.0 > ../streamlit.log 2>&1 &
+          echo $! > ../streamlit.pid
+          sleep 15
+
+      - name: Smoke test Streamlit frontend
+        run: |
+          curl -f http://localhost:8501/ || (echo "Streamlit health check failed" && cat streamlit.log && exit 1)
+
+      - name: Stop Streamlit frontend
+        if: always()
+        run: |
+          if [ -f streamlit.pid ]; then
+            kill $(cat streamlit.pid) || true
+            rm streamlit.pid
+          fi
+          if [ -f streamlit.log ]; then
+            echo "Streamlit logs:"
+            cat streamlit.log
+          fi
 
       - name: Lint
         working-directory: 3-cicd
