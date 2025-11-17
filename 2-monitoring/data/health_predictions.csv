@@ -1,0 +1,401 @@
+Age,Gender,self_employed,family_history,work_interfere,no_employees,remote_work,tech_company,benefits,care_options,wellness_program,seek_help,anonymity,leave,mental_health_consequence,phys_health_consequence,coworkers,supervisor,mental_health_interview,phys_health_interview,mental_vs_physical,obs_consequence,ts,prediction,probability,model_version,treatment
+25.0,Male,No,No,,More than 1000,Yes,Yes,Yes,Yes,Yes,Yes,Don't know,Don't know,No,No,Yes,Yes,Maybe,Yes,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,female,No,No,Never,More than 1000,No,Yes,Yes,Yes,Yes,Yes,Don't know,Don't know,Maybe,No,Some of them,Yes,Maybe,No,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+18.0,Male,No,No,Often,6-25,No,Yes,No,Not sure,No,No,Don't know,Somewhat difficult,Yes,Maybe,No,Some of them,No,No,No,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+22.0,male,Yes,No,,1-5,Yes,Yes,Don't know,No,Don't know,Don't know,Don't know,Very easy,Maybe,Maybe,Some of them,Some of them,Maybe,Maybe,Yes,Yes,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Female,Yes,Yes,Sometimes,100-500,Yes,Yes,Don't know,Not sure,Don't know,Don't know,Don't know,Don't know,Maybe,Maybe,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+44.0,Female,No,No,Never,100-500,No,Yes,Yes,Not sure,Don't know,Don't know,Don't know,Don't know,Maybe,Maybe,No,Some of them,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+36.0,Male,No,No,Rarely,500-1000,Yes,Yes,Yes,Yes,Don't know,Don't know,Don't know,Don't know,Maybe,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+24.0,male,No,Yes,Sometimes,More than 1000,No,Yes,Yes,Yes,No,Yes,Don't know,Somewhat easy,Maybe,No,Some of them,No,No,Maybe,Yes,Yes,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Neuter,No,No,Sometimes,More than 1000,No,No,Don't know,No,Yes,Yes,Don't know,Don't know,No,No,Yes,Some of them,Yes,Yes,Yes,Yes,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,M,No,No,Sometimes,6-25,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,Yes,Yes,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Male,No,No,,26-100,No,Yes,No,No,No,No,Don't know,Very easy,Yes,No,No,No,No,No,No,Yes,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+43.0,Male,No,No,Rarely,More than 1000,No,Yes,Yes,Yes,Yes,Yes,Don't know,Somewhat easy,No,No,Yes,Yes,Maybe,Yes,Yes,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+29.0,Male,No,No,Often,6-25,No,No,Don't know,No,No,No,Don't know,Don't know,Maybe,No,Yes,Yes,Maybe,Maybe,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+35.0,Male,No,No,,More than 1000,No,No,No,No,No,No,Don't know,Don't know,Maybe,Maybe,No,No,No,No,No,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,female,No,Yes,Sometimes,More than 1000,No,Yes,Yes,Yes,Yes,No,Don't know,Don't know,Yes,Yes,No,No,No,No,No,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Man,No,No,,100-500,Yes,Yes,Yes,Not sure,Don't know,Yes,Don't know,Somewhat easy,No,No,Some of them,Some of them,No,No,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,female,No,No,Never,100-500,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,Maybe,No,No,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+48.0,Female (cis),No,Yes,Often,26-100,No,Yes,Don't know,No,No,No,No,Very difficult,Yes,Yes,No,Some of them,No,No,No,Yes,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+34.0,male,Yes,Yes,Rarely,26-100,Yes,Yes,No,No,No,Don't know,Don't know,Somewhat difficult,No,No,Yes,Yes,No,Maybe,Yes,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+35.0,Female,No,No,Sometimes,100-500,No,No,Yes,No,No,No,Yes,Very difficult,Yes,Maybe,No,Some of them,No,Yes,No,Yes,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+38.0,Male,No,Yes,Sometimes,100-500,No,Yes,No,Not sure,No,No,Don't know,Very difficult,Yes,Yes,No,Some of them,No,Maybe,No,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+39.0,Male,No,No,Never,26-100,No,Yes,Yes,Yes,Yes,Yes,Yes,Very easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+56.0,Male ,No,Yes,Rarely,6-25,No,Yes,Yes,Yes,No,No,Don't know,Don't know,Yes,Maybe,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+35.0,Male,No,No,Sometimes,More than 1000,No,Yes,Don't know,Not sure,Yes,Don't know,Don't know,Don't know,Maybe,No,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+23.0,Male,No,No,Never,More than 1000,No,No,No,Yes,Yes,Yes,Yes,Somewhat difficult,No,No,Yes,Yes,No,Yes,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+41.0,m,No,Yes,Sometimes,More than 1000,No,Yes,Yes,Not sure,Yes,Yes,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,No,No,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+24.0,Male,No,No,Sometimes,6-25,No,Yes,Don't know,No,Don't know,Don't know,Don't know,Don't know,No,No,Yes,Yes,Maybe,Maybe,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+23.0,Male,No,No,Never,26-100,No,Yes,Yes,Not sure,Yes,Don't know,Don't know,Very easy,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+24.0,male,Yes,No,Sometimes,1-5,No,Yes,Yes,Yes,Don't know,Don't know,Yes,Somewhat easy,No,No,Some of them,Some of them,Maybe,Maybe,Yes,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,Male,No,No,,26-100,Yes,Yes,Don't know,Not sure,No,Don't know,Don't know,Don't know,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+36.0,Male,No,Yes,Often,100-500,No,Yes,No,Yes,No,No,Yes,Very easy,No,No,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+55.0,male,No,No,Often,More than 1000,No,No,Yes,Yes,Yes,Yes,Don't know,Somewhat easy,Yes,Maybe,No,Some of them,No,Maybe,No,Yes,2025-11-13T17:44:18.806439+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,Female,No,No,,More than 1000,No,Yes,Yes,Not sure,Don't know,Don't know,Don't know,Somewhat easy,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+39.0,Male,Yes,No,,6-25,No,Yes,No,No,Yes,No,Yes,Somewhat easy,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Male ,No,Yes,Often,More than 1000,No,Yes,Yes,Not sure,Don't know,Don't know,Don't know,Don't know,Maybe,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+24.0,Male,No,No,,6-25,No,Yes,Don't know,Not sure,Don't know,No,Yes,Somewhat easy,No,No,Some of them,Yes,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+45.0,Male,No,No,Often,1-5,Yes,Yes,Yes,Not sure,No,Yes,Don't know,Very easy,No,No,Yes,Yes,No,Maybe,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,M,No,No,Sometimes,100-500,No,Yes,Don't know,No,No,No,Don't know,Don't know,Yes,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+35.0,Male,No,No,Often,1-5,No,No,No,No,No,No,Yes,Very difficult,Yes,No,Some of them,Some of them,No,Yes,No,Yes,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+22.0,M,Yes,No,Never,1-5,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,No,Maybe,Some of them,Yes,Maybe,Yes,No,Yes,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+35.0,Male,No,Yes,Rarely,100-500,Yes,No,Yes,Yes,No,No,Yes,Very difficult,Yes,No,Some of them,No,No,Maybe,No,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,Male,No,No,Sometimes,26-100,No,Yes,No,No,No,No,Don't know,Don't know,Yes,Maybe,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,Male,No,No,Never,6-25,No,Yes,Don't know,No,No,Don't know,Don't know,Don't know,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,male,No,No,,6-25,No,Yes,No,Yes,No,Don't know,Don't know,Very easy,No,No,Some of them,Yes,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,Male,No,Yes,Sometimes,100-500,No,Yes,No,No,No,No,Don't know,Somewhat easy,No,No,Some of them,Some of them,No,No,Don't know,Yes,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,Male,No,Yes,Sometimes,26-100,Yes,Yes,No,No,No,No,Don't know,Somewhat difficult,Yes,No,Some of them,No,No,Yes,No,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+23.0,Male,No,No,,More than 1000,No,No,Yes,No,No,No,Don't know,Don't know,No,No,Yes,No,No,Yes,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,Male,No,Yes,Rarely,1-5,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Somewhat easy,No,No,Yes,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,female,No,Yes,Often,100-500,Yes,No,Yes,Yes,Yes,Yes,Yes,Somewhat easy,Yes,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+33.0,Male,No,No,,100-500,No,Yes,Yes,No,Yes,Yes,Yes,Don't know,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+38.0,Male,No,No,Sometimes,More than 1000,Yes,Yes,Yes,No,Yes,Yes,Yes,Very easy,No,No,Yes,Yes,No,No,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+37.0,Male,No,Yes,Never,26-100,No,Yes,Don't know,No,No,Don't know,Don't know,Somewhat easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+33.0,Male,No,No,,100-500,Yes,Yes,Don't know,Not sure,Don't know,Don't know,Don't know,Don't know,No,No,Some of them,Yes,Maybe,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+39.0,male,No,No,Rarely,100-500,Yes,Yes,Yes,Yes,No,No,Yes,Very easy,Maybe,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+29.0,M,No,No,Sometimes,6-25,No,Yes,Yes,Yes,No,Yes,Yes,Very easy,No,No,No,Some of them,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Male,No,Yes,Often,26-100,Yes,Yes,Yes,Yes,No,No,Yes,Somewhat difficult,No,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+27.0,male,No,No,,26-100,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,No,No,Some of them,Yes,Yes,Yes,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,Male,No,No,Never,6-25,No,Yes,No,No,No,Don't know,Don't know,Very easy,No,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+33.0,female,No,No,Often,More than 1000,No,Yes,Yes,Yes,Don't know,Don't know,Don't know,Don't know,Yes,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+40.0,m,Yes,Yes,Sometimes,1-5,Yes,Yes,No,Yes,No,No,Yes,Very easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+41.0,Male,No,No,Never,More than 1000,No,No,Don't know,No,No,Don't know,Don't know,Don't know,Maybe,No,No,No,No,Yes,Don't know,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+40.0,Female,No,No,,26-100,No,Yes,Yes,Yes,Yes,Yes,Yes,Somewhat easy,No,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,No,Rarely,More than 1000,No,Yes,Yes,No,Yes,Yes,Yes,Don't know,No,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:20.886417+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,male,No,Yes,Often,100-500,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,Yes,Don't know,No,2025-11-13T17:44:20.886417+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+39.0,M,No,No,Rarely,More than 1000,Yes,No,Don't know,No,Yes,Yes,Don't know,Don't know,No,No,Some of them,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+26.0,Male,No,Yes,,6-25,No,Yes,Yes,Yes,No,Yes,Yes,Very easy,No,No,Some of them,Yes,Maybe,Maybe,No,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+34.0,Male,No,No,Sometimes,100-500,Yes,Yes,No,No,No,No,Don't know,Somewhat easy,Yes,Yes,Some of them,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+25.0,Male,No,Yes,Sometimes,26-100,No,No,Yes,Yes,No,No,Yes,Don't know,Maybe,No,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Male,No,No,,26-100,No,No,No,No,No,No,Yes,Somewhat easy,No,No,Some of them,Yes,Maybe,Yes,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,Yes,,26-100,No,Yes,No,No,No,No,Don't know,Don't know,Maybe,No,Some of them,Yes,No,Yes,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,Yes,,6-25,Yes,Yes,Yes,Yes,No,No,Don't know,Somewhat easy,Maybe,Maybe,Some of them,Some of them,No,Maybe,Yes,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+34.0,Male,No,Yes,Sometimes,26-100,Yes,No,Yes,No,No,No,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+22.0,Male,No,Yes,Sometimes,6-25,Yes,Yes,No,Not sure,No,Don't know,Don't know,Somewhat easy,No,No,Some of them,Yes,Maybe,Yes,Yes,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+21.0,Male,No,No,Often,More than 1000,No,No,No,Yes,No,No,No,Don't know,Yes,No,Some of them,Some of them,No,Yes,No,Yes,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,male,No,Yes,Rarely,26-100,No,Yes,Yes,No,No,Don't know,Don't know,Don't know,Maybe,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,Female,No,Yes,Sometimes,More than 1000,No,No,Yes,Yes,Yes,No,Don't know,Somewhat easy,No,No,Some of them,Yes,No,No,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+36.0,Male,Yes,No,Sometimes,1-5,No,Yes,No,No,No,No,Don't know,Very easy,No,No,Yes,No,No,No,Yes,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+25.0,Female,No,Yes,Sometimes,26-100,Yes,Yes,Don't know,No,No,No,Don't know,Don't know,Maybe,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+35.0,Female,No,No,Never,500-1000,Yes,Yes,Don't know,Not sure,No,No,Don't know,Don't know,Maybe,Maybe,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+41.0,Male,No,No,Rarely,500-1000,Yes,Yes,Yes,Yes,No,Don't know,Don't know,Don't know,Maybe,Maybe,Some of them,No,Maybe,Maybe,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,Male,No,No,Never,1-5,Yes,Yes,No,Yes,No,No,Don't know,Don't know,Yes,Yes,No,No,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Female,No,Yes,Rarely,More than 1000,No,No,Don't know,Not sure,No,Don't know,Don't know,Very difficult,Yes,Maybe,No,No,No,Maybe,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+27.0,Male,No,No,Never,26-100,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Somewhat easy,No,No,Some of them,No,Yes,Yes,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Female,No,No,Often,26-100,Yes,Yes,Yes,Yes,No,No,Don't know,Very easy,Maybe,No,Some of them,Some of them,No,Yes,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+39.0,Male,No,Yes,Often,26-100,No,Yes,Yes,Yes,No,No,Yes,Don't know,Yes,No,Some of them,No,No,No,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+22.0,Male,No,No,,6-25,No,Yes,Don't know,No,No,No,Don't know,Don't know,No,No,Some of them,Yes,Maybe,Maybe,No,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+46.0,Male,No,No,Rarely,More than 1000,No,No,Yes,Yes,Yes,Yes,Yes,Somewhat easy,Yes,Maybe,No,No,No,Maybe,Yes,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+23.0,Male,No,No,Sometimes,1-5,No,Yes,No,Yes,No,No,No,Very easy,Maybe,Maybe,Some of them,Yes,No,No,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,male,No,No,Often,26-100,No,Yes,No,No,Don't know,No,Don't know,Somewhat easy,Maybe,No,Some of them,Some of them,Maybe,Yes,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,Male,No,Yes,Often,6-25,No,Yes,Don't know,No,No,Don't know,Don't know,Somewhat easy,Maybe,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,Male,No,Yes,,6-25,No,Yes,No,No,No,No,Don't know,Very easy,No,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+40.0,Female,No,Yes,Sometimes,100-500,No,No,Yes,Not sure,Yes,Don't know,Don't know,Don't know,Yes,Maybe,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,male,No,No,Often,6-25,No,Yes,No,No,No,No,No,Somewhat difficult,Yes,No,No,No,No,Yes,Yes,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,female,No,No,Sometimes,26-100,Yes,Yes,No,No,No,No,Don't know,Don't know,Maybe,Maybe,Yes,Some of them,Maybe,No,No,No,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,Male,Yes,No,Sometimes,6-25,No,Yes,No,Yes,No,No,No,Very difficult,Yes,Yes,No,No,No,No,Yes,Yes,2025-11-13T17:44:23.092009+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+29.0,Male,No,No,,6-25,Yes,Yes,Don't know,Not sure,No,No,Don't know,Very easy,No,No,Yes,Yes,No,No,Don't know,No,2025-11-13T17:44:23.092009+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+36.0,M,No,No,Rarely,More than 1000,No,Yes,Yes,Yes,Yes,Yes,Yes,Somewhat difficult,No,No,Some of them,Yes,No,No,No,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+39.0,M,No,No,,26-100,Yes,Yes,Yes,No,No,No,Don't know,Don't know,Yes,Maybe,No,No,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,m,No,No,Sometimes,100-500,No,Yes,Yes,Yes,No,No,Don't know,Somewhat easy,Maybe,No,Some of them,No,No,Maybe,No,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+18.0,male,No,No,,500-1000,Yes,No,Don't know,No,No,Don't know,Don't know,Very easy,Yes,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,Male,No,No,Sometimes,26-100,No,Yes,Don't know,No,No,No,Don't know,Don't know,No,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,Male,No,Yes,Often,26-100,No,Yes,No,No,No,No,Don't know,Somewhat easy,Maybe,Maybe,Yes,Yes,No,No,No,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,male,No,No,Sometimes,6-25,No,Yes,No,Yes,No,No,Don't know,Somewhat easy,Maybe,Maybe,No,Some of them,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+37.0,Male,No,No,Sometimes,6-25,No,Yes,No,No,No,No,Don't know,Very difficult,Yes,Maybe,Some of them,No,No,Maybe,No,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Male,Yes,Yes,Rarely,1-5,Yes,Yes,No,Yes,No,No,Don't know,Somewhat difficult,Yes,No,No,No,No,No,No,Yes,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+33.0,Male,No,No,Sometimes,26-100,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,Maybe,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+22.0,Male,No,Yes,Often,100-500,No,No,Yes,Yes,Yes,Yes,Yes,Don't know,Maybe,Maybe,No,Yes,No,Maybe,Don't know,Yes,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+21.0,M,No,No,Sometimes,6-25,No,No,Don't know,Not sure,No,Yes,Yes,Don't know,No,No,Some of them,Some of them,Maybe,Maybe,Yes,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+23.0,male,Yes,Yes,Sometimes,1-5,No,Yes,No,No,No,No,Don't know,Very difficult,Yes,No,No,No,No,Maybe,No,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+39.0,Male,Yes,No,Often,6-25,No,Yes,No,No,No,No,Don't know,Very difficult,Maybe,No,Some of them,No,No,Maybe,No,Yes,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+56.0,Male,No,No,Never,More than 1000,No,Yes,Yes,Not sure,Don't know,Don't know,Don't know,Don't know,No,Maybe,Yes,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Female,No,No,,More than 1000,No,No,Yes,Not sure,Yes,Don't know,Don't know,Don't know,Maybe,No,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,male,No,No,,6-25,No,Yes,Yes,Not sure,No,Don't know,Yes,Very easy,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,Male,No,Yes,Sometimes,26-100,No,No,Don't know,No,No,Don't know,Don't know,Somewhat difficult,Maybe,No,Some of them,Some of them,No,Maybe,No,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,female,No,No,,6-25,No,Yes,Yes,No,No,No,Don't know,Somewhat easy,No,No,Yes,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+36.0,Male,No,No,Often,6-25,No,Yes,Yes,No,No,No,Yes,Don't know,Maybe,No,No,No,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,F,No,No,Never,500-1000,No,No,Yes,No,No,Don't know,Don't know,Somewhat difficult,Maybe,No,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+23.0,female,No,No,Sometimes,26-100,No,Yes,Yes,Yes,No,Don't know,Don't know,Don't know,Maybe,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Male,No,No,Never,100-500,No,Yes,Yes,Not sure,Don't know,Yes,Don't know,Somewhat easy,No,No,No,Some of them,Maybe,Yes,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+26.0,male,No,No,,100-500,No,Yes,No,No,No,No,No,Very easy,Yes,Maybe,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+38.0,Male,No,No,Sometimes,26-100,Yes,Yes,Don't know,Not sure,No,Don't know,Don't know,Don't know,Maybe,Maybe,Some of them,Yes,No,Maybe,No,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+26.0,female,No,Yes,Sometimes,More than 1000,No,Yes,Yes,Yes,No,No,Don't know,Don't know,No,No,Some of them,Yes,No,Maybe,No,Yes,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+-1726.0,male,No,No,Sometimes,26-100,No,No,No,No,No,No,Don't know,Somewhat difficult,Yes,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+31.0,Male,No,Yes,Sometimes,6-25,No,Yes,No,No,No,No,Don't know,Somewhat easy,Maybe,Maybe,No,No,No,No,Yes,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+23.0,Male,No,Yes,Rarely,1-5,No,Yes,No,Yes,No,No,Don't know,Don't know,Maybe,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+25.0,Female,No,Yes,Sometimes,6-25,No,Yes,Yes,Yes,No,No,Yes,Somewhat easy,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,male,No,No,Often,1-5,No,Yes,Don't know,No,No,Yes,Don't know,Very easy,No,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,m,No,No,Never,26-100,No,Yes,No,No,No,No,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:25.204983+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+42.0,male,No,Yes,Sometimes,6-25,Yes,Yes,Don't know,No,No,Don't know,Don't know,Don't know,Maybe,No,Some of them,Yes,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Male,No,No,Never,100-500,No,Yes,Yes,Yes,No,Don't know,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,F,No,Yes,Sometimes,26-100,No,Yes,Yes,Yes,Yes,Don't know,Don't know,Very easy,No,No,Yes,Yes,No,Yes,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+45.0,male,No,No,Never,More than 1000,Yes,Yes,Don't know,Not sure,No,No,Don't know,Don't know,Yes,No,Yes,Some of them,No,No,No,Yes,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,M,No,Yes,Sometimes,26-100,No,Yes,Yes,Yes,Don't know,No,Yes,Very easy,No,No,Yes,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Male,No,No,Rarely,100-500,No,Yes,Don't know,No,No,No,Don't know,Don't know,Maybe,No,Yes,Yes,No,Maybe,No,Yes,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,Male,No,Yes,Rarely,6-25,No,Yes,No,No,No,No,No,Don't know,Maybe,No,Yes,Yes,No,No,Don't know,Yes,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+37.0,male,No,No,,6-25,Yes,Yes,No,Not sure,No,No,Don't know,Don't know,Maybe,No,Some of them,No,Maybe,Yes,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,No,,6-25,No,Yes,No,No,No,No,Don't know,Don't know,No,No,No,No,No,No,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,M,No,No,Never,500-1000,No,No,Yes,Not sure,Yes,Yes,Don't know,Very easy,Maybe,No,No,No,No,No,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+51.0,M,No,No,Never,More than 1000,Yes,Yes,Don't know,No,No,Don't know,Don't know,Don't know,Yes,No,No,No,No,No,No,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+24.0,male,No,No,Never,26-100,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Don't know,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+38.0,m,No,Yes,Sometimes,100-500,Yes,No,Yes,Yes,No,Yes,Yes,Very easy,No,No,Yes,Yes,Yes,Yes,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+25.0,Male,No,Yes,Sometimes,26-100,Yes,Yes,No,No,No,No,Yes,Very easy,No,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+33.0,Female,No,No,Never,100-500,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Very easy,Maybe,No,Some of them,Some of them,No,Maybe,No,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+29.0,Male,No,No,,6-25,Yes,Yes,Yes,Not sure,No,Yes,Don't know,Don't know,Maybe,No,Some of them,Yes,Maybe,Yes,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+40.0,Male,No,No,Never,100-500,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Very easy,Maybe,No,Yes,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,Male,No,No,Sometimes,100-500,No,Yes,No,Yes,No,No,Don't know,Don't know,Maybe,Maybe,Some of them,Some of them,No,No,No,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,Male,Yes,No,,1-5,No,Yes,No,Yes,No,No,Yes,Very easy,No,No,Yes,Yes,Yes,Yes,Yes,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,Female,No,No,Rarely,More than 1000,No,No,Yes,Yes,No,Don't know,Don't know,Don't know,Maybe,No,No,No,No,No,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+28.0,Male,No,No,Sometimes,More than 1000,No,Yes,No,No,No,No,No,Very difficult,Yes,Maybe,No,Some of them,No,Maybe,No,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+42.0,male,No,No,Never,100-500,No,No,Yes,No,Yes,No,Don't know,Very difficult,Maybe,No,Yes,Yes,Maybe,Yes,No,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+23.0,male,Yes,Yes,Often,26-100,Yes,Yes,Don't know,No,Don't know,Don't know,Don't know,Don't know,No,Maybe,Yes,Yes,Maybe,Yes,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+27.0,Male,No,Yes,Sometimes,6-25,No,Yes,No,No,No,No,Yes,Somewhat easy,Maybe,Maybe,Yes,Yes,Yes,Yes,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+24.0,Male,No,No,,100-500,No,Yes,Don't know,Not sure,No,No,Don't know,Somewhat easy,Maybe,Maybe,Some of them,Yes,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,M,No,No,,100-500,No,Yes,No,No,No,No,Don't know,Don't know,No,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Female,No,Yes,Rarely,100-500,No,Yes,Yes,Yes,No,No,Yes,Somewhat easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+36.0,Male,No,Yes,Sometimes,More than 1000,Yes,No,Don't know,No,Don't know,Don't know,Don't know,Don't know,Yes,Maybe,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,maile,No,Yes,,6-25,Yes,Yes,Don't know,No,No,No,Don't know,Somewhat easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,Male,No,No,Sometimes,26-100,No,Yes,Yes,No,Yes,Yes,Yes,Somewhat difficult,Maybe,No,Some of them,Yes,No,Maybe,Yes,No,2025-11-13T17:44:27.297656+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+23.0,Male,No,Yes,Sometimes,6-25,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Don't know,Maybe,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,male leaning androgynous,No,No,Sometimes,26-100,Yes,Yes,No,Yes,No,No,Yes,Very difficult,Yes,Maybe,Some of them,No,No,Maybe,No,Yes,2025-11-13T17:44:27.297656+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+33.0,Male,No,Yes,Sometimes,More than 1000,No,Yes,Yes,No,Yes,Yes,Don't know,Don't know,Yes,No,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Male,No,Yes,,6-25,No,Yes,Don't know,Not sure,No,No,Don't know,Don't know,No,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,male,Yes,No,Sometimes,6-25,Yes,Yes,No,Yes,No,No,Yes,Somewhat easy,No,No,Some of them,Yes,Yes,Yes,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+26.0,Male,No,No,Never,26-100,No,Yes,No,Not sure,No,Don't know,Don't know,Somewhat difficult,No,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+25.0,Male,No,Yes,Often,6-25,No,Yes,No,Yes,No,No,No,Very difficult,Yes,Maybe,No,No,No,Yes,No,Yes,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+24.0,Female,No,Yes,Sometimes,100-500,No,Yes,Yes,Not sure,No,No,Don't know,Somewhat difficult,Yes,Maybe,No,No,No,No,No,Yes,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+33.0,Male,No,No,Rarely,1-5,Yes,Yes,Don't know,No,No,No,Don't know,Don't know,Yes,Maybe,No,No,No,Maybe,No,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+36.0,M,No,No,Never,More than 1000,No,Yes,Yes,Yes,Yes,Yes,Yes,Very easy,No,No,Some of them,Yes,No,No,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+20.0,Male,No,No,Never,26-100,No,Yes,Don't know,Not sure,Don't know,Don't know,Don't know,Don't know,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,Male,Yes,No,Never,1-5,No,Yes,No,No,No,No,No,Somewhat easy,No,No,Yes,Yes,No,No,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+46.0,Male,No,Yes,Sometimes,6-25,No,Yes,Don't know,Yes,No,Don't know,Don't know,Don't know,Yes,Maybe,No,Some of them,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,Male,No,No,,More than 1000,No,No,Yes,Not sure,Yes,Don't know,Don't know,Don't know,Maybe,Maybe,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,M,No,No,Often,6-25,No,Yes,Yes,No,No,No,Yes,Somewhat easy,Maybe,Maybe,Yes,Some of them,No,Yes,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+34.0,Male,No,Yes,Often,26-100,No,Yes,No,Yes,No,No,Yes,Very easy,Maybe,Maybe,Yes,Yes,No,No,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+37.0,Male,No,No,,100-500,Yes,No,Don't know,No,Don't know,Don't know,Don't know,Somewhat easy,Maybe,No,Yes,Yes,No,No,Don't know,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+24.0,"ostensibly male, unsure what that really means",No,No,Sometimes,6-25,No,No,Don't know,No,No,Don't know,Don't know,Don't know,Yes,Maybe,No,No,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+32.0,male,No,No,,6-25,No,Yes,No,Yes,No,No,Don't know,Very difficult,Yes,Maybe,No,No,No,No,No,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+37.0,Male,No,Yes,,500-1000,No,No,Yes,Yes,No,No,Yes,Very easy,Maybe,No,No,No,No,No,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,0
+32.0,male,Yes,No,Sometimes,1-5,No,Yes,No,No,No,No,Yes,Very difficult,Maybe,No,Some of them,Yes,No,Maybe,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+38.0,cis male,No,No,Never,More than 1000,No,Yes,Yes,Yes,Yes,Yes,Yes,Somewhat easy,Maybe,Maybe,Some of them,Some of them,No,Maybe,No,Yes,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,Male,No,No,Never,6-25,Yes,Yes,No,Yes,No,No,Don't know,Don't know,Maybe,Maybe,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Male,No,No,Sometimes,More than 1000,No,Yes,Yes,Yes,Don't know,Don't know,Yes,Somewhat easy,No,No,Yes,Yes,No,No,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+26.0,Female,No,Yes,Rarely,More than 1000,No,Yes,Yes,Not sure,Don't know,Don't know,Don't know,Don't know,Maybe,No,Some of them,Some of them,No,No,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+40.0,Male,No,Yes,Sometimes,1-5,Yes,Yes,No,No,No,No,Don't know,Don't know,Maybe,Maybe,Some of them,Yes,No,Maybe,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+35.0,Male,No,No,Never,6-25,No,Yes,No,Yes,No,No,Yes,Very easy,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,female,No,Yes,,More than 1000,No,No,No,Yes,No,No,Yes,Don't know,Maybe,No,No,No,No,Yes,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Male,No,No,,More than 1000,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Very easy,No,No,Some of them,Yes,Maybe,Yes,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+44.0,male,No,Yes,Sometimes,6-25,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Somewhat difficult,Maybe,Maybe,Some of them,Yes,No,Maybe,No,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+36.0,f,No,Yes,,6-25,No,Yes,Don't know,No,No,Don't know,Don't know,Don't know,No,No,No,Some of them,No,Maybe,Yes,No,2025-11-13T17:44:29.394062+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,Yes,Sometimes,100-500,Yes,Yes,Don't know,No,No,Don't know,Don't know,Don't know,No,No,Some of them,No,No,No,Yes,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+29.0,Male,No,Yes,Sometimes,26-100,No,No,Yes,Yes,Yes,Yes,Don't know,Don't know,Maybe,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,Male,No,Yes,Sometimes,26-100,Yes,Yes,Yes,No,No,No,Don't know,Don't know,Maybe,No,Some of them,No,No,Maybe,Don't know,No,2025-11-13T17:44:29.394062+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,Mail,No,No,Never,26-100,Yes,Yes,Yes,Yes,Don't know,Don't know,Yes,Very easy,No,No,Some of them,Yes,Maybe,Maybe,Yes,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+27.0,Male,No,No,Sometimes,100-500,No,Yes,Yes,Not sure,Yes,Yes,Don't know,Don't know,Maybe,No,Some of them,Yes,No,Maybe,Don't know,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+28.0,Male,No,Yes,Sometimes,More than 1000,No,Yes,Don't know,Not sure,No,Don't know,Don't know,Somewhat difficult,Maybe,Maybe,No,No,No,No,No,No,2025-11-13T17:44:31.494887+00:00,1,1.0,58c4a506f04542329fdfaf0fbff8f06b,1
+30.0,Male,No,No,Sometimes,26-100,No,Yes,Don't know,Not sure,No,No,Don't know,Somewhat easy,Maybe,No,Some of them,No,No,Yes,No,Yes,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+30.0,female,No,Yes,,500-1000,No,Yes,No,No,No,No,Don't know,Don't know,Yes,Maybe,No,No,No,No,Don't know,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+31.0,Male,,No,Sometimes,6-25,Yes,Yes,Don't know,No,No,No,Don't know,Don't know,No,No,Some of them,Yes,No,No,Don't know,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,1
+23.0,Male,No,No,Sometimes,6-25,No,No,No,No,No,No,No,Somewhat easy,Yes,Yes,No,No,No,No,No,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+29.0,Male,No,No,Rarely,More than 1000,No,Yes,Yes,No,No,No,Don't know,Very easy,Yes,Maybe,Some of them,No,No,No,Don't know,No,2025-11-13T17:44:31.494887+00:00,0,0.0,58c4a506f04542329fdfaf0fbff8f06b,0
+,Male,No,No,,More than 1000,,,,Yes,,,,Don't know,No,,Yes,Yes,Maybe,Yes,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,No,Never,More than 1000,,,,Yes,,,,Don't know,Maybe,,Some of them,Yes,Maybe,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Often,6-25,,,,Not sure,,,,Somewhat difficult,Yes,,No,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,No,,1-5,,,,No,,,,Very easy,Maybe,,Some of them,Some of them,Maybe,Maybe,,Yes,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,Yes,Yes,Sometimes,100-500,,,,Not sure,,,,Don't know,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,Never,100-500,,,,Not sure,,,,Don't know,Maybe,,No,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,500-1000,,,,Yes,,,,Don't know,Maybe,,No,No,No,Maybe,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,Yes,Sometimes,More than 1000,,,,Yes,,,,Somewhat easy,Maybe,,Some of them,No,No,Maybe,,Yes,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Neuter,No,No,Sometimes,More than 1000,,,,No,,,,Don't know,No,,Yes,Some of them,Yes,Yes,,Yes,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Sometimes,6-25,,,,Not sure,,,,Don't know,Yes,,Some of them,No,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,26-100,,,,No,,,,Very easy,Yes,,No,No,No,No,,Yes,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,More than 1000,,,,Yes,,,,Somewhat easy,No,,Yes,Yes,Maybe,Yes,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Often,6-25,,,,No,,,,Don't know,Maybe,,Yes,Yes,Maybe,Maybe,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,,More than 1000,,,,No,,,,Don't know,Maybe,,No,No,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,Yes,Sometimes,More than 1000,,,,Yes,,,,Don't know,Yes,,No,No,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Man,No,No,,100-500,,,,Not sure,,,,Somewhat easy,No,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,No,Never,100-500,,,,Not sure,,,,Don't know,Maybe,,No,Some of them,No,Maybe,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female (cis),No,Yes,Often,26-100,,,,No,,,,Very difficult,Yes,,No,Some of them,No,No,,Yes,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,Yes,Rarely,26-100,,,,No,,,,Somewhat difficult,No,,Yes,Yes,No,Maybe,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,Sometimes,100-500,,,,No,,,,Very difficult,Yes,,No,Some of them,No,Yes,,Yes,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,100-500,,,,Not sure,,,,Very difficult,Yes,,No,Some of them,No,Maybe,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,26-100,,,,Yes,,,,Very easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male ,No,Yes,Rarely,6-25,,,,Yes,,,,Don't know,Yes,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,More than 1000,,,,Yes,,,,Somewhat difficult,No,,Yes,Yes,No,Yes,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,m,No,Yes,Sometimes,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,6-25,,,,No,,,,Don't know,No,,Yes,Yes,Maybe,Maybe,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,26-100,,,,Not sure,,,,Very easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,No,Sometimes,1-5,,,,Yes,,,,Somewhat easy,No,,Some of them,Some of them,Maybe,Maybe,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,,26-100,,,,Not sure,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:02.534430+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Often,100-500,,,,Yes,,,,Very easy,No,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Often,More than 1000,,,,Yes,,,,Somewhat easy,Yes,,No,Some of them,No,Maybe,,Yes,2025-11-16T17:06:02.534430+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,,More than 1000,,,,Not sure,,,,Somewhat easy,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,Yes,No,,6-25,,,,No,,,,Somewhat easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male ,No,Yes,Often,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,6-25,,,,Not sure,,,,Somewhat easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Often,1-5,,,,Not sure,,,,Very easy,No,,Yes,Yes,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Sometimes,100-500,,,,No,,,,Don't know,Yes,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Often,1-5,,,,No,,,,Very difficult,Yes,,Some of them,Some of them,No,Yes,,Yes,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,Yes,No,Never,1-5,,,,Not sure,,,,Don't know,No,,Some of them,Yes,Maybe,Yes,,Yes,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Rarely,100-500,,,,Yes,,,,Very difficult,Yes,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,26-100,,,,No,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,6-25,,,,No,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,No,,6-25,,,,Yes,,,,Very easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,100-500,,,,No,,,,Somewhat easy,No,,Some of them,Some of them,No,No,,Yes,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,26-100,,,,No,,,,Somewhat difficult,Yes,,Some of them,No,No,Yes,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,More than 1000,,,,No,,,,Don't know,No,,Yes,No,No,Yes,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Rarely,1-5,,,,Yes,,,,Somewhat easy,No,,Yes,Yes,Maybe,Maybe,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,female,No,Yes,Often,100-500,,,,Yes,,,,Somewhat easy,Yes,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,100-500,,,,No,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,More than 1000,,,,No,,,,Very easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Never,26-100,,,,No,,,,Somewhat easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,,100-500,,,,Not sure,,,,Don't know,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,No,Rarely,100-500,,,,Yes,,,,Very easy,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Sometimes,6-25,,,,Yes,,,,Very easy,No,,No,Some of them,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Often,26-100,,,,Yes,,,,Somewhat difficult,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,,26-100,,,,Not sure,,,,Don't know,No,,Some of them,Yes,Yes,Yes,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,6-25,,,,No,,,,Very easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,No,Often,More than 1000,,,,Yes,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,m,Yes,Yes,Sometimes,1-5,,,,Yes,,,,Very easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,More than 1000,,,,No,,,,Don't know,Maybe,,No,No,No,Yes,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,,26-100,,,,Yes,,,,Somewhat easy,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,More than 1000,,,,No,,,,Don't know,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:04.621853+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,Yes,Often,100-500,,,,Not sure,,,,Don't know,Maybe,,Some of them,Some of them,No,Yes,,No,2025-11-16T17:06:04.621853+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Rarely,More than 1000,,,,No,,,,Don't know,No,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,,6-25,,,,Yes,,,,Very easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,100-500,,,,No,,,,Somewhat easy,Yes,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,26-100,,,,Yes,,,,Don't know,Maybe,,Some of them,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,26-100,,,,No,,,,Somewhat easy,No,,Some of them,Yes,Maybe,Yes,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,,26-100,,,,No,,,,Don't know,Maybe,,Some of them,Yes,No,Yes,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,,6-25,,,,Yes,,,,Somewhat easy,Maybe,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,26-100,,,,No,,,,Don't know,Maybe,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,6-25,,,,Not sure,,,,Somewhat easy,No,,Some of them,Yes,Maybe,Yes,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Often,More than 1000,,,,Yes,,,,Don't know,Yes,,Some of them,Some of them,No,Yes,,Yes,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,Yes,Rarely,26-100,,,,No,,,,Don't know,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,Yes,Sometimes,More than 1000,,,,Yes,,,,Somewhat easy,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,Yes,No,Sometimes,1-5,,,,No,,,,Very easy,No,,Yes,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,Yes,Sometimes,26-100,,,,No,,,,Don't know,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,Never,500-1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,500-1000,,,,Yes,,,,Don't know,Maybe,,Some of them,No,Maybe,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,1-5,,,,Yes,,,,Don't know,Yes,,No,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,No,Yes,Rarely,More than 1000,,,,Not sure,,,,Very difficult,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,26-100,,,,Not sure,,,,Somewhat easy,No,,Some of them,No,Yes,Yes,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,No,No,Often,26-100,,,,Yes,,,,Very easy,Maybe,,Some of them,Some of them,No,Yes,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Often,26-100,,,,Yes,,,,Don't know,Yes,,Some of them,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,6-25,,,,No,,,,Don't know,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,More than 1000,,,,Yes,,,,Somewhat easy,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,1-5,,,,Yes,,,,Very easy,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Often,26-100,,,,No,,,,Somewhat easy,Maybe,,Some of them,Some of them,Maybe,Yes,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Often,6-25,,,,No,,,,Somewhat easy,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,,6-25,,,,No,,,,Very easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,No,Yes,Sometimes,100-500,,,,Not sure,,,,Don't know,Yes,,Some of them,No,No,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Often,6-25,,,,No,,,,Somewhat difficult,Yes,,No,No,No,Yes,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,No,Sometimes,26-100,,,,No,,,,Don't know,Maybe,,Yes,Some of them,Maybe,No,,No,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,Yes,No,Sometimes,6-25,,,,Yes,,,,Very difficult,Yes,,No,No,No,No,,Yes,2025-11-16T17:06:06.711220+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,6-25,,,,Not sure,,,,Very easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:06.711220+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,Rarely,More than 1000,,,,Yes,,,,Somewhat difficult,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,,26-100,,,,No,,,,Don't know,Yes,,No,No,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,m,No,No,Sometimes,100-500,,,,Yes,,,,Somewhat easy,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,,500-1000,,,,No,,,,Very easy,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,26-100,,,,No,,,,Don't know,No,,No,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Often,26-100,,,,No,,,,Somewhat easy,Maybe,,Yes,Yes,No,No,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Sometimes,6-25,,,,Yes,,,,Somewhat easy,Maybe,,No,Some of them,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,6-25,,,,No,,,,Very difficult,Yes,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,Yes,Yes,Rarely,1-5,,,,Yes,,,,Somewhat difficult,Yes,,No,No,No,No,,Yes,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,26-100,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Often,100-500,,,,Yes,,,,Don't know,Maybe,,No,Yes,No,Maybe,,Yes,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Sometimes,6-25,,,,Not sure,,,,Don't know,No,,Some of them,Some of them,Maybe,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,Yes,Sometimes,1-5,,,,No,,,,Very difficult,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,Yes,No,Often,6-25,,,,No,,,,Very difficult,Maybe,,Some of them,No,No,Maybe,,Yes,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,More than 1000,,,,Not sure,,,,Don't know,No,,Yes,Some of them,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,No,,6-25,,,,Not sure,,,,Very easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,26-100,,,,No,,,,Somewhat difficult,Maybe,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,female,No,No,,6-25,,,,No,,,,Somewhat easy,No,,Yes,Yes,Maybe,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Often,6-25,,,,No,,,,Don't know,Maybe,,No,No,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,F,No,No,Never,500-1000,,,,No,,,,Somewhat difficult,Maybe,,Some of them,No,No,No,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,female,No,No,Sometimes,26-100,,,,Yes,,,,Don't know,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,100-500,,,,Not sure,,,,Somewhat easy,No,,No,Some of them,Maybe,Yes,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,No,,100-500,,,,No,,,,Very easy,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,26-100,,,,Not sure,,,,Don't know,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,Yes,Sometimes,More than 1000,,,,Yes,,,,Don't know,No,,Some of them,Yes,No,Maybe,,Yes,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Sometimes,26-100,,,,No,,,,Somewhat difficult,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,6-25,,,,No,,,,Somewhat easy,Maybe,,No,No,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Rarely,1-5,,,,Yes,,,,Don't know,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,Yes,Sometimes,6-25,,,,Yes,,,,Somewhat easy,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Often,1-5,,,,No,,,,Very easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:08.804837+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,m,No,No,Never,26-100,,,,No,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:08.804837+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,Yes,Sometimes,6-25,,,,No,,,,Don't know,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,100-500,,,,Yes,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,F,No,Yes,Sometimes,26-100,,,,Yes,,,,Very easy,No,,Yes,Yes,No,Yes,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Never,More than 1000,,,,Not sure,,,,Don't know,Yes,,Yes,Some of them,No,No,,Yes,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,Yes,Sometimes,26-100,,,,Yes,,,,Very easy,No,,Yes,Yes,Maybe,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Rarely,100-500,,,,No,,,,Don't know,Maybe,,Yes,Yes,No,Maybe,,Yes,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Rarely,6-25,,,,No,,,,Don't know,Maybe,,Yes,Yes,No,No,,Yes,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,,6-25,,,,Not sure,,,,Don't know,Maybe,,Some of them,No,Maybe,Yes,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,,6-25,,,,No,,,,Don't know,No,,No,No,No,No,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,Never,500-1000,,,,Not sure,,,,Very easy,Maybe,,No,No,No,No,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,M,No,No,Never,More than 1000,,,,No,,,,Don't know,Yes,,No,No,No,No,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,No,Never,26-100,,,,Not sure,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,m,No,Yes,Sometimes,100-500,,,,Yes,,,,Very easy,No,,Yes,Yes,Yes,Yes,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,26-100,,,,No,,,,Very easy,No,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,No,Never,100-500,,,,Not sure,,,,Very easy,Maybe,,Some of them,Some of them,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,6-25,,,,Not sure,,,,Don't know,Maybe,,Some of them,Yes,Maybe,Yes,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,100-500,,,,Not sure,,,,Very easy,Maybe,,Yes,Some of them,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,100-500,,,,Yes,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,Yes,No,,1-5,,,,Yes,,,,Very easy,No,,Yes,Yes,Yes,Yes,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,No,No,Rarely,More than 1000,,,,Yes,,,,Don't know,Maybe,,No,No,No,No,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,More than 1000,,,,No,,,,Very difficult,Yes,,No,Some of them,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,Never,100-500,,,,No,,,,Very difficult,Maybe,,Yes,Yes,Maybe,Yes,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,Yes,Often,26-100,,,,No,,,,Don't know,No,,Yes,Yes,Maybe,Yes,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,6-25,,,,No,,,,Somewhat easy,Maybe,,Yes,Yes,Yes,Yes,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,100-500,,,,Not sure,,,,Somewhat easy,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,,100-500,,,,No,,,,Don't know,No,,No,No,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Female,No,Yes,Rarely,100-500,,,,Yes,,,,Somewhat easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,More than 1000,,,,No,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,maile,No,Yes,,6-25,,,,No,,,,Somewhat easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,26-100,,,,No,,,,Somewhat difficult,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,6-25,,,,Not sure,,,,Don't know,Maybe,,No,No,No,Maybe,,No,2025-11-16T17:06:10.922259+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male leaning androgynous,No,No,Sometimes,26-100,,,,Yes,,,,Very difficult,Yes,,Some of them,No,No,Maybe,,Yes,2025-11-16T17:06:10.922259+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,More than 1000,,,,No,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,,6-25,,,,Not sure,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,No,Sometimes,6-25,,,,Yes,,,,Somewhat easy,No,,Some of them,Yes,Yes,Yes,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,26-100,,,,Not sure,,,,Somewhat difficult,No,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Often,6-25,,,,Yes,,,,Very difficult,Yes,,No,No,No,Yes,,Yes,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,Yes,Sometimes,100-500,,,,Not sure,,,,Somewhat difficult,Yes,,No,No,No,No,,Yes,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Rarely,1-5,,,,No,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,Never,More than 1000,,,,Yes,,,,Very easy,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,26-100,,,,Not sure,,,,Don't know,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,Yes,No,Never,1-5,,,,No,,,,Somewhat easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,6-25,,,,Yes,,,,Don't know,Yes,,No,Some of them,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,M,No,No,Often,6-25,,,,No,,,,Somewhat easy,Maybe,,Yes,Some of them,No,Yes,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Often,26-100,,,,Yes,,,,Very easy,Maybe,,Yes,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,,100-500,,,,No,,,,Somewhat easy,Maybe,,Yes,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,"ostensibly male, unsure what that really means",No,No,Sometimes,6-25,,,,No,,,,Don't know,Yes,,No,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,male,No,No,,6-25,,,,Yes,,,,Very difficult,Yes,,No,No,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,,500-1000,,,,Yes,,,,Very easy,Maybe,,No,No,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,Yes,No,Sometimes,1-5,,,,No,,,,Very difficult,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,cis male,No,No,Never,More than 1000,,,,Yes,,,,Somewhat easy,Maybe,,Some of them,Some of them,No,Maybe,,Yes,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Never,6-25,,,,Yes,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,More than 1000,,,,Yes,,,,Somewhat easy,No,,Yes,Yes,No,No,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Female,No,Yes,Rarely,More than 1000,,,,Not sure,,,,Don't know,Maybe,,Some of them,Some of them,No,No,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,1-5,,,,No,,,,Don't know,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Never,6-25,,,,Yes,,,,Very easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,Yes,,More than 1000,,,,Yes,,,,Don't know,Maybe,,No,No,No,Yes,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,,More than 1000,,,,Yes,,,,Very easy,No,,Some of them,Yes,Maybe,Yes,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,male,No,Yes,Sometimes,6-25,,,,Yes,,,,Somewhat difficult,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,f,No,Yes,,6-25,,,,No,,,,Don't know,No,,No,Some of them,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,100-500,,,,No,,,,Don't know,No,,Some of them,No,No,No,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,26-100,,,,Yes,,,,Don't know,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,Yes,Sometimes,26-100,,,,No,,,,Don't know,Maybe,,Some of them,No,No,Maybe,,No,2025-11-16T17:06:13.015990+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Mail,No,No,Never,26-100,,,,Yes,,,,Very easy,No,,Some of them,Yes,Maybe,Maybe,,No,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Sometimes,100-500,,,,Not sure,,,,Don't know,Maybe,,Some of them,Yes,No,Maybe,,No,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,Yes,Sometimes,More than 1000,,,,Not sure,,,,Somewhat difficult,Maybe,,No,No,No,No,,No,2025-11-16T17:06:15.090314+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,26-100,,,,Not sure,,,,Somewhat easy,Maybe,,Some of them,No,No,Yes,,Yes,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,female,No,Yes,,500-1000,,,,No,,,,Don't know,Yes,,No,No,No,No,,No,2025-11-16T17:06:15.090314+00:00,1,1.0,b08da955deba4206a614984b97a1c60e,0
+,Male,,No,Sometimes,6-25,,,,No,,,,Don't know,No,,Some of them,Yes,No,No,,No,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,1
+,Male,No,No,Sometimes,6-25,,,,No,,,,Somewhat easy,Yes,,No,No,No,No,,No,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
+,Male,No,No,Rarely,More than 1000,,,,No,,,,Very easy,Yes,,Some of them,No,No,No,,No,2025-11-16T17:06:15.090314+00:00,0,0.0,b08da955deba4206a614984b97a1c60e,0
