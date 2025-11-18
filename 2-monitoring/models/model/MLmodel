@@ -1,4 +1,4 @@
-artifact_path: file:C:/Users/dell/OneDrive/Documentos/MLOPS/2-monitoring/mlruns/391579205154348011/models/m-18a78f6db98d49adb63fd6014a36ac06/artifacts
+artifact_path: file:C:/Users/dell/OneDrive/Documentos/MLOPS/2-monitoring/mlruns/391579205154348011/models/m-158479097e7d4fda9cd96f692304a7ee/artifacts
 flavors:
   python_function:
     env:
@@ -14,9 +14,9 @@ flavors:
     serialization_format: cloudpickle
     sklearn_version: 1.7.2
 mlflow_version: 3.5.1
-model_id: m-18a78f6db98d49adb63fd6014a36ac06
+model_id: m-158479097e7d4fda9cd96f692304a7ee
 model_size_bytes: 1191277
-model_uuid: m-18a78f6db98d49adb63fd6014a36ac06
+model_uuid: m-158479097e7d4fda9cd96f692304a7ee
 prompts: null
-run_id: 7ad2e3d82747444c950edb40438b442c
-utc_time_created: '2025-11-17 18:13:21.774569'
+run_id: f90f1d84c7f547d79a79df20e9d9b738
+utc_time_created: '2025-11-18 17:22:12.594385'
