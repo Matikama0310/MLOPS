@@ -45,8 +45,13 @@ The root `requirements.txt` simply aggregates each sub-project’s pinned depend
    - Reference them in your workflow file as `${{ secrets.KAGGLE_USERNAME }}` and `${{ secrets.KAGGLE_KEY }}` when running `python train.py`.
 3. Start running the MLFlow server, by writing in the activated terminal the following
 ```powershell
+mlflow server --host 127.0.0.1 --port 5000
+```
+Or for mac
+```powershell
 mlflow server --host 127.0.0.1 --port 5010
 ```
+Open http://localhost:5000 or http://127.0.0.1:5000 on windows
 Open http://localhost:5010 or http://127.0.0.1:5010 on mac (leave running).
 4. Open a new terminal, activate the enviroment and go to the 3 folder
    From `3-cicd/`, run: 
